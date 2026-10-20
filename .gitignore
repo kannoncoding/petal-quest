@@ -1,0 +1,55 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Build output and machine-specific Android tooling
+**/build/
+**/.gradle/
+**/.kotlin/
+**/.externalNativeBuild/
+**/.cxx/
+*.hprof
+
+# Signing material and local credentials
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+key.properties
+keystore.properties
+signing.properties
+.env
+.env.*
+!.env.example
+credentials.json
+service-account*.json
+serviceAccount*.json
+*-firebase-adminsdk-*.json
+
+# Keep real family, personal and health records outside source control.
+# Use synthetic fixtures for development; place any local records here.
+private-data/
+personal-data/
+health-data/
+real-data/
+private-exports/
+exports/private/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
