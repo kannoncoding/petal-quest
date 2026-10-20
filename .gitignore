@@ -39,6 +39,7 @@ credentials.json
 service-account*.json
 serviceAccount*.json
 *-firebase-adminsdk-*.json
+google-services.json
 
 # Keep real family, personal and health records outside source control.
 # Use synthetic fixtures for development; place any local records here.

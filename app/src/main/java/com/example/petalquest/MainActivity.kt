@@ -20,10 +20,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             PetalQuestTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    if (BuildConfig.DEBUG) {
+                        Phase2SetupScreen(modifier = Modifier.padding(innerPadding))
+                    } else {
+                        Greeting(name = "Android", modifier = Modifier.padding(innerPadding))
+                    }
                 }
             }
         }
