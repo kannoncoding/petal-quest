@@ -78,6 +78,20 @@ public final class SessionStore {
         }
     }
 
+    /** A late refresh must never revive a logged-out or replaced identity. */
+    public boolean refreshIfCurrent(Session expected, Session replacement) {
+        if (expected == null || replacement == null) throw new IllegalArgumentException("Sessions required");
+        synchronized (LocalData.LOCK) {
+            Session active = read();
+            if (active == null || !active.generation.equals(expected.generation) ||
+                !active.userId.equals(expected.userId) || !active.endpointId.equals(expected.endpointId)) return false;
+            if (!replacement.userId.equals(expected.userId) || !replacement.endpointId.equals(expected.endpointId))
+                throw new IllegalArgumentException("Refresh identity mismatch");
+            save(replacement);
+            return true;
+        }
+    }
+
     /** Clears current family cache and queue, then auth. Private health is retained. */
     public void clear() {
         synchronized (LocalData.LOCK) {

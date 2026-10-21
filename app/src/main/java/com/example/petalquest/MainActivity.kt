@@ -1,6 +1,10 @@
 package com.example.petalquest
 
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,6 +32,14 @@ class MainActivity : ComponentActivity() {
     private val localData by lazy { com.petalquest.core.data.LocalData.getInstance(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    try { com.example.petalquest.health.TeenHealthSync.getInstance(this@MainActivity).poll() } catch (_: Exception) { /* No enrollment or health logging on startup. */ }
+                    delay(30_000L)
+                }
+            }
+        }
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(android.graphics.Color.rgb(16, 21, 32)),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.rgb(16, 21, 32))

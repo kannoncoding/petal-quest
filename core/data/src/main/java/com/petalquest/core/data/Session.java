@@ -26,6 +26,7 @@ public final class Session {
     }
 
     public boolean isExpired() { return System.currentTimeMillis() / 1000 >= expiresAtEpochSeconds; }
+    public String getGeneration() { return generation; }
 
     static String required(String value, String label) {
         if (value == null || value.trim().isEmpty()) throw new IllegalArgumentException(label + " is required");

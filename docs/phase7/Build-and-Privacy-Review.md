@@ -26,3 +26,7 @@ A successful build/static review does not prove Samsung biometric/device-credent
 Anyone with the accepted phone credential or enrolled strong biometric can unlock this phone's journal. Parent accounts gain no default data access through the Parent app. If a device-bound key or export passphrase is lost, no administrator/parent reset can decrypt the old data; destructive reset only removes it.
 
 References: Android Developers cryptography, Android Keystore and biometric/device-credential authentication documentation. Full implementation notes are in core/health/README.md.
+
+## Revised parent controls/privacy boundary
+
+The owner subsequently authorized date-only family sharing, remote Parent-only bulk deletion and generic high-pain check-ins at7-10. Prior local-only-all-health and Teen reset statements are historical. New code has been reviewed/built; migrations and notification worker are prepared but not deployed, two alert-policy answers remain pending, and the phone disconnected before APK installation. See Parent-Controls-and-Sharing.md for safeguards, limitations and exact scope. No new automated tests or SQL execution is claimed.

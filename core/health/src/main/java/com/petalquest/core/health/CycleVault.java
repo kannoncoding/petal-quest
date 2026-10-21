@@ -24,6 +24,11 @@ import javax.crypto.spec.SecretKeySpec;
 /** Device-local authenticated vault. All operations share this instance's monitor.
  * Keep one instance per application; never persist snapshots or export without explicit consent. */
 public final class CycleVault {
+    private static CycleVault applicationInstance;
+    public static synchronized CycleVault getInstance(Context context) {
+        if (applicationInstance == null) applicationInstance = new CycleVault(context.getApplicationContext());
+        return applicationInstance;
+    }
     private static final String ALIAS = "petalquest.privatecycle.wrap.v1";
     private static final byte[] HEADER = new byte[]{80,81,67,86,1};
     private final AtomicFile vault, wrapped;

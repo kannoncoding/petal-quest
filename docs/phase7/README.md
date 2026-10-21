@@ -1,6 +1,10 @@
+## Current scope update
+
+See Parent-Controls-and-Sharing.md and Owner-Actions.md. Owner approved remote Parent-only bulk deletion, parent period-date access and generic high-pain check-ins (7-10). This supersedes earlier local-only-all-health and Teen-reset statements below. Notes/descriptions remain private. Alert timing/text remain pending; disabled policy prevents candidate alert metadata transmission. The new APK installation is pending reconnection of the Samsung.
+
 # Phase 7 — private cycle logging
 
-Status: implementation started 2026-10-21. Source: development plan revision 4, page 11; privacy boundary page 2; recovery/export extension page 15. Phase 6 baseline committed and pushed to GitHub main as 2cd1620 before Phase 7 code changes.
+Status: initial implementation built; owner-confirmed initial unlock/persistence passed. New parent controls/date-sharing scope is implemented and built, with deployment, alert choices/setup and phone acceptance pending. Source: development plan revision 4, page 11; privacy boundary page 2; recovery/export extension page 15. Phase 6 baseline committed and pushed to GitHub main as 2cd1620 before Phase 7 code changes.
 
 ## Approved lock decision
 

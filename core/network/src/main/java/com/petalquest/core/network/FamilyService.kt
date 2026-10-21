@@ -58,7 +58,9 @@ class FamilyService(private val config: ServiceConfig) {
  }
  suspend fun rpc(name: String, token: String, args: JSONObject): JSONObject {
   requireContract(token)
-  require(name in setOf("create_family","issue_parent_invite","issue_teen_pairing","accept_parent_invite","redeem_teen_pairing","create_occurrence","reconcile_occurrences","submit_occurrence","approve_submission","revoke_membership","issue_teen_replacement","register_device"))
+  require(name in setOf("create_family","issue_parent_invite","issue_teen_pairing","accept_parent_invite","redeem_teen_pairing","create_occurrence","reconcile_occurrences","submit_occurrence","approve_submission","revoke_membership","issue_teen_replacement","register_device",
+   "register_health_installation", "list_health_installations", "request_wipe", "list_pending_wipes", "claim_wipe", "acknowledge_wipe",
+   "upsert_period_range", "delete_period_range", "list_period_ranges", "submit_high_pain_checkin", "list_parent_checkins", "get_checkin_policy"))
   val result = JSONObject(request("/rest/v1/rpc/" + name,token,args))
   if(result.has("error")) throw IllegalStateException(when(result.optString("error")) {
    "rate_limited" -> "Too many code attempts. Wait and try again."
@@ -69,4 +71,25 @@ class FamilyService(private val config: ServiceConfig) {
   }
   return result
  }
+ data class HealthInstallation(val installationId: String, val enrollmentGeneration: String, val wipeStatus: String?)
+ data class PeriodRange(val installationId: String, val recordId: String, val startDate: String, val endDate: String?)
+ suspend fun healthInstallations(token: String, familyId: String): List<HealthInstallation> {
+  java.util.UUID.fromString(familyId)
+  val items = rpc("list_health_installations", token, JSONObject()).getJSONArray("installations")
+  return (0 until items.length()).map { items.getJSONObject(it) }.filter { it.getString("family_id") == familyId }.map {
+   HealthInstallation(it.getString("installation_id"), it.getString("enrollment_generation"), it.optString("latest_wipe_status").takeIf { value -> value.isNotBlank() && value != "null" })
+  }
+ }
+ suspend fun periodRanges(token: String, familyId: String): List<PeriodRange> {
+  java.util.UUID.fromString(familyId)
+  val items = rpc("list_period_ranges", token, JSONObject().put("p_family_id", familyId)).getJSONArray("period_ranges")
+  return (0 until items.length()).map { items.getJSONObject(it) }.map {
+   PeriodRange(it.getString("installation_id"), it.getString("record_id"), it.getString("start_date"), if (it.isNull("end_date")) null else it.getString("end_date"))
+  }
+ }
+ suspend fun requestHealthWipe(token: String, installationId: String, enrollmentGeneration: String, requestId: String): JSONObject {
+  java.util.UUID.fromString(installationId); java.util.UUID.fromString(enrollmentGeneration); java.util.UUID.fromString(requestId)
+  return rpc("request_wipe", token, JSONObject().put("p_installation_id", installationId).put("p_enrollment_generation", enrollmentGeneration).put("p_request_id", requestId))
+ }
+
 }

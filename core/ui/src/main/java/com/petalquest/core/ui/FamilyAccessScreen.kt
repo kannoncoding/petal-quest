@@ -84,6 +84,7 @@ fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: Loca
     OutlinedTextField(code,{code=it},label={Text("Parent invitation code")})
     Button(enabled=!busy && code.isNotBlank(),onClick={action { val result=service.rpc("accept_parent_invite",token(),JSONObject().put("p_code",code.trim()));reload();check(memberships.any { it.familyId==result.getString("family_id") && it.role=="parent" }) { "Membership could not be verified. Refresh family access." };code="";message="Invitation accepted." }}) {Text("Accept parent invitation")}
     if(memberships.any { it.familyId==selectedFamily && it.role=="parent" }) {
+     key(selectedFamily, session!!.userId, config.url) { ParentHealthControls(service, selectedFamily, { token() }, !busy) }
      listOf("Invite parent" to "issue_parent_invite", "Pair teen" to "issue_teen_pairing").forEach { (label,rpc) ->
       Button(enabled=!busy,onClick={action { val result=service.rpc(rpc,token(),JSONObject().put("p_family_id",selectedFamily));issuedCode=result.getString("code");message="Code expires: " + result.getString("expires_at") }}) {Text(label)}
      }

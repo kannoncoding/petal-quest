@@ -36,3 +36,7 @@ Production deployment and other family-phone compatibility are deferred. Full pr
 ## Phase 7 implementation
 
 The Teen app now includes a private cycle activity and a separate core:health encrypted local vault, phone authentication/relocking, calendar/history/optional observations, encrypted passphrase export and explicit health deletion. Parent has no core:health dependency. Both debug builds compile; the Teen update is installed on the Samsung. Static privacy QA passed after corrections. Phone feature acceptance is still pending, and no new automated Phase7 tests were run. See docs/phase7/Owner-Actions.md and Build-and-Privacy-Review.md. No Phase7 completion or restore interoperability is claimed.
+
+### Revised Phase7 parent controls
+
+Owner approved Parent-only remote bulk deletion, shared perioddate ranges and generic highpain7-10 check-ins. Notes/observations remainlocal. Start/end datepickers fixed. New codebuilds; see docs/phase7/Parent-Controls-and-Sharing.md. Apply only the new phase7-parent-health-upgrade.sql to an existing accepted development schema; it has not been executed. Alerts remain disabled pending timing/text choices and server worker/secret/schedule setup. The Samsung disconnected before the new APK install. No updated feature acceptance is claimed.
