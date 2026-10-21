@@ -93,7 +93,7 @@ begin
  select coalesce(jsonb_agg(d.push_token),'[]'::jsonb) into payload from public.device_registrations d
  where d.family_id=q.family_id and d.user_id=q.recipient_user_id
  and exists(select 1 from public.memberships p where p.family_id=d.family_id and p.user_id=d.user_id and p.role='parent' and p.active);
- deliveries:=deliveries||jsonb_build_array(jsonb_build_object('delivery_id',q.id,'lease_id',lease,'recipient_user_id',q.recipient_user_id,'tokens',payload,'push_text',approved_text));
+ deliveries:=deliveries||jsonb_build_array(jsonb_build_object('delivery_id',q.id,'lease_id',lease,'recipient_user_id',q.recipient_user_id,'local_date',q.local_date,'tokens',payload,'push_text',approved_text));
  end loop;
  return jsonb_build_object('deliveries',deliveries);
 end $$;

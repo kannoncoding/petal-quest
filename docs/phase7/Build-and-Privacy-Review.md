@@ -1,32 +1,14 @@
-# Phase 7 build and static privacy review
+# Phase 7 build and privacy review — current revision
 
-Status: implementation built and installed; physical-device feature acceptance pending. No new automated tests were added or run.
+Both updated applications built and installed in place on the connected Samsung. Existing app data was preserved. Gradle :app:assembleDebug :parent:assembleDebug succeeded in 9 seconds, 167 tasks (4 executed, 163 up-to-date). Local build log: approved-alert-build.local.log.
 
-## Build/install evidence
+- Teen APK SHA256: 510FD3CF7155FEBC4D335E31C08E0F23B0286B1A70A045246B161828ECAD89C8
+- Parent APK SHA256: 7F73A2E2332F7C3D077A73F4632D966310B83CBFBE4EB38BC52E04ABC8011D4B
 
-Final command: Gradle :app:assembleDebug :parent:assembleDebug. BUILD SUCCESSFUL in 11 seconds; 167 actionable tasks (8 executed,159 up-to-date). Local log: build-debug.local.log. Uses the existing Android Studio JDK/Gradle cache and process-local selector temporary directory.
+Independent source review covered authentication/background clearing, vault fail-closed handling, export derivation outside the vault monitor, dedicated date pickers, limited payloads, generation-bound deletion, claim/ACK persistence, correction ordering, session refresh races, Parent receiver recipient gating and Costa Rica expiry. Parent has no CycleVault dependency. Teen has no bulk health deletion/reset control.
 
-- Teen APK SHA256: 0ac43f701c1ba88e65154997436d37b0f82b34d3d5b54a05c047a8f8e8265047
-- Parent APK SHA256: 320ff8bfcfe2f44a07b40b8db9c7e0efd3c7134e6b96f847ffad57b617f60c99
+Owner reported initial journal unlock/persistence success and then the expected policy activation row (include_backdated=false, approved text). A read-only public endpoint check found health routes present and denied anonymous access (401/42501). This does not prove complete deployed permissions or feature behavior. The forward activation query applies migration004's expiry repair.
 
-ADB install -r of Teen succeeded on Samsung R5CWB2MXQHZ; MainActivity launched. No app data was cleared. Parent was built for integration but not reinstalled. Static APK string inspection found CycleVault in Teen DEX and absent from Parent DEX; this is supporting dependency evidence, not a complete privacy penetration test.
+Node syntax check passed for the Edge worker source. No new automated tests or SQL runtime tests were run. Builds and static review do not establish phone authentication lifecycle, actual backup/transfer exclusion, portable restore, date-sharing/deletion behavior or push delivery. Worker/secrets/schedule remain pending. Other family phones and API24–29 fallback remain unverified. Import/restore remains Phase11.
 
-## Reviewed controls and corrections
-
-Independent static privacy QA reviewed both developer agents' code. Findings corrected: Costa Rica date timezone; Sunday calendar markers; no saved/autofill health form state; synchronous composition disposal and vault locking on stop; stale authentication callback/export destination cleanup; subjective enum flow; password keyboard settings; responsive flow choices; encrypted export; expensive password derivation moved off UI thread/outside the vault monitor; fresh phone authentication for destructive locked recovery reset without requiring a readable vault.
-
-Storage uses standard AES-256-GCM with platform random IVs and authenticated envelope metadata; a random data key is wrapped under an authentication-required Android Keystore key. The active data key is only held for the unlocked session. Failure to open existing files/keys is explicit and does not silently create replacement content. Export uses PBKDF2-HMAC-SHA256 on API26+ or the documented standard SHA1 fallback on API24-25, random salt and AES-GCM; encryption parameters and future restore restrictions are documented in core/health/README.md. There is no plaintext file export or custom encryption primitive.
-
-The new module has no networking dependencies. Only Teen depends on it; Parent has no health UI/API. All health content is in noBackupFilesDir/private_cycle, with whole-vault encryption. Shared family logout does not delete it. Existing all-domain backup/cloud/device-transfer exclusions remain in Teen XML. FLAG_SECURE applies to the private activity; forms are discarded on background, rotation or leaving. The store is device-local, not automatically synchronized by family membership.
-
-## Limits requiring acceptance
-
-A successful build/static review does not prove Samsung biometric/device-credential callback lifecycle, automatic locking/screen capture behavior, persisted corrections, validation usability, export ciphertext/portable restore or real OS backup/device-transfer behavior. Owner fictional-record walkthrough is in Owner-Actions.md. API24-29 credential fallback and other family phones are untested. Import/restore is Phase11; the encrypted format exists, but no successful restore is claimed.
-
-Anyone with the accepted phone credential or enrolled strong biometric can unlock this phone's journal. Parent accounts gain no default data access through the Parent app. If a device-bound key or export passphrase is lost, no administrator/parent reset can decrypt the old data; destructive reset only removes it.
-
-References: Android Developers cryptography, Android Keystore and biometric/device-credential authentication documentation. Full implementation notes are in core/health/README.md.
-
-## Revised parent controls/privacy boundary
-
-The owner subsequently authorized date-only family sharing, remote Parent-only bulk deletion and generic high-pain check-ins at7-10. Prior local-only-all-health and Teen reset statements are historical. New code has been reviewed/built; migrations and notification worker are prepared but not deployed, two alert-policy answers remain pending, and the phone disconnected before APK installation. See Parent-Controls-and-Sharing.md for safeguards, limitations and exact scope. No new automated tests or SQL execution is claimed.
+The owner-authorized sharing scope supersedes earlier claims that all health data stays local: only confirmed period ranges and generic check-in metadata leave the device; notes, descriptions, symptoms, exact pain scores and keys remain local. Shared metadata is subject to provider retention. Remote deletion excludes exported files and provider backups. See Parent-Controls-and-Sharing.md, Owner-Actions.md and Push-Setup.md.

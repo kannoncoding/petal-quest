@@ -27,7 +27,12 @@ class ParentMessagingService : FirebaseMessagingService() {
   try {
    val data = message.data
    if (message.notification != null || data["kind"] != "parent_checkin" || !pushOptIn(this) || !notificationPermission(this)) return
-   val body = data["checkin_text"]?.takeIf { it in setOf("Petal Quest: please check in", "Check on daughter — feeling pain") } ?: return
+   val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).apply {
+    timeZone = java.util.TimeZone.getTimeZone("America/Costa_Rica")
+   }.format(java.util.Date())
+   val expiresAt = data["expires_at_epoch"]?.toLongOrNull() ?: return
+   if (data["local_date"] != today || System.currentTimeMillis()/1000 >= expiresAt) return
+   val body = data["checkin_text"]?.takeIf { it == "High pain levels today - please check in" } ?: return
    val recipient = UUID.fromString(data["recipient_user_id"]).toString()
    val event = UUID.fromString(data["event_id"]).toString()
    val config = parentConfig()

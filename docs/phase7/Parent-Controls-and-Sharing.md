@@ -1,6 +1,6 @@
 # Phase 7 owner changes: parent controls and limited sharing
 
-Status: implementation built and statically reviewed; server migration, alert decisions/setup, phone installation and acceptance are pending. This supersedes earlier Phase7 statements that all health stays local and Teen can bulk-reset/delete its journal.
+Status: both apps built, statically reviewed and installed. Owner confirmed the expected activated policy row and expiry repair. Worker/secrets/schedule and feature acceptance remain pending. This supersedes earlier Phase7 statements that all health stays local and Teen can bulk-reset/delete its journal.
 
 ## Confirmed changes
 
@@ -9,7 +9,7 @@ Status: implementation built and statically reviewed; server migration, alert de
 - Parent may request remote deletion of a specific enrolled Teen device's local health journal. The app processes it on its next active, connected synchronization; it is not an instant operating-system remote wipe.
 - Parent may read only confirmed period date ranges. Daily descriptions, notes, symptoms, consistency, flow category, exact pain score/location and encryption keys remain local.
 - Pain scores 7-10 trigger a generic check-in candidate after a daily entry is saved. This is a family notification preference, not a clinical severity assessment.
-- Today-only versus backdated alert eligibility and approved notification text remain unanswered. Both server policy values default NULL; the client reads this disabled policy BEFORE transmitting even a candidate check-in date. Alerts remain disabled until decisions are recorded and server configuration is completed.
+- Owner approved today-only entries in Costa Rica, with text: High pain levels today - please check in. The policy is activated by owner report. Dispatch and receiver expiry guards prevent a prior-day message being displayed as today. Backdated entries do not qualify.
 
 ## New data boundary
 
@@ -27,8 +27,8 @@ Device-control setup requires the matching Teen family session and fresh phone a
 
 ## Push delivery
 
-A prepared development-only Supabase Edge worker uses server-held FCM service-account credentials and service-role-only queue leases. Data-only messages include an intended parent identity; the Parent receiver checks its current account before displaying approved fixed text. No raw health details or tokens are logged. Retries are deduplicated/tagged, but exactly-once phone display and human receipt are not guaranteed. The worker, scheduler, server secrets and final policy have NOT been deployed/configured or accepted.
+A prepared development-only Supabase Edge worker uses server-held FCM service-account credentials and service-role-only queue leases. Data-only messages include an intended parent identity; the Parent receiver checks its current account before displaying approved fixed text. No raw health details or tokens are logged. Retries are deduplicated/tagged, but exactly-once phone display and human receipt are not guaranteed. The policy is applied; worker deployment, scheduler and server secrets remain pending. Actual delivery is not accepted yet.
 
 ## Evidence
 
-Both debug apps compile; Node syntax-check of the Edge TypeScript source passes. Independent source QA reviewed device/generation targeting, correction synchronization, claim/ACK crash handling, enrollment recovery, limited payloads, disabled alert privacy gate and receiver account gating. No new automated tests or SQL runtime checks were run. The previous initial unlock/persistence walkthrough was owner-confirmed successful before these changes. The attempted APK update found the Samsung disconnected; these new APKs are not installed yet.
+Both debug apps compile; Node syntax-check of the Edge TypeScript source passes. Independent source QA reviewed device/generation targeting, correction synchronization, claim/ACK crash handling, enrollment recovery, limited payloads, disabled alert privacy gate and receiver account gating. No new automated tests or SQL runtime checks were run. The previous initial unlock/persistence walkthrough was owner-confirmed successful before these changes. Both revised APKs are now installed in place on the Samsung. New sharing/deletion/delivery walkthroughs remain pending.

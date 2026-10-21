@@ -4,8 +4,7 @@ import { JWT } from "npm:google-auth-library@10.3.0";
 const DEVELOPMENT = "https://hijtwgugzzpjjkuutyfy.supabase.co";
 const FIREBASE_PROJECT = "petal-quest-dev";
 const approvedMessages = new Set([
-  "Petal Quest: please check in",
-  "Check on daughter — feeling pain",
+  "High pain levels today - please check in",
 ]);
 
 async function matchesSecret(actual: string, expected: string): Promise<boolean> {
@@ -51,15 +50,25 @@ Deno.serve(async (request: Request) => {
         typeof account.client_email !== "string" || typeof account.private_key !== "string") {
       return reply(503, { status: "not_configured" });
     }
+    const batch = await rpc("claim_high_pain_push", { p_limit: 5 });
+    if (!Array.isArray(batch.deliveries) || batch.deliveries.length === 0) {
+      return reply(200, { status: "processed", completed: 0, retry: 0 });
+    }
     const client = new JWT({ email: account.client_email, key: account.private_key,
       scopes: ["https://www.googleapis.com/auth/firebase.messaging"] });
     const access = await client.getAccessToken();
     if (!access.token) return reply(503, { status: "push_unavailable" });
-    const batch = await rpc("claim_high_pain_push", { p_limit: 5 });
     let completed = 0, retry = 0;
     for (const delivery of batch.deliveries || []) {
+      const eventDate = typeof delivery.local_date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(delivery.local_date) ? delivery.local_date : "";
+      const expiresAt = eventDate ? Date.parse(`${eventDate}T00:00:00-06:00`) + 86400000 : NaN;
+      if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) {
+        await rpc("complete_high_pain_push", { p_delivery_id: delivery.delivery_id, p_lease_id: delivery.lease_id, p_success: true });
+        completed++;
+        continue;
+      }
       let success = approvedMessages.has(delivery.push_text) &&
-        Array.isArray(delivery.tokens) && delivery.tokens.length > 0;
+        Number.isFinite(expiresAt) && Array.isArray(delivery.tokens) && delivery.tokens.length > 0;
       if (success) {
         for (const token of delivery.tokens) {
           if (typeof token !== "string" || token.length > 4096) { success = false; continue; }
@@ -71,8 +80,9 @@ Deno.serve(async (request: Request) => {
                 // Data-only: the Parent receiver checks its current account
                 // before showing anything, including after account switches.
                 data: { kind: "parent_checkin", event_id: delivery.delivery_id,
-                  recipient_user_id: delivery.recipient_user_id, checkin_text: delivery.push_text },
-                android: { priority: "HIGH", ttl: "86400s", collapse_key: `checkin-${delivery.delivery_id}`,
+                  recipient_user_id: delivery.recipient_user_id, checkin_text: delivery.push_text,
+                  local_date: eventDate, expires_at_epoch: String(Math.floor(expiresAt / 1000)) },
+                android: { priority: "HIGH", ttl: `${Math.max(0, Math.min(86400, Math.floor((expiresAt - Date.now()) / 1000)))}s`, collapse_key: `checkin-${delivery.delivery_id}`,
                 },
               } }),
             });
