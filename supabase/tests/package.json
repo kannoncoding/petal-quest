@@ -1,0 +1,7 @@
+{
+  "name": "petal-quest-phase6-verification",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node verify-local.mjs" },
+  "devDependencies": { "@electric-sql/pglite": "0.5.11" }
+}

@@ -1,0 +1,155 @@
+{
+  "date": "2026-10-21T16:00:57.171Z",
+  "scope": "Disposable local PGlite PostgreSQL with minimal Supabase Auth role/claim stubs; no hosted Supabase or real accounts accessed",
+  "engine": "PGlite 0.5.11",
+  "passed": 35,
+  "failed": 0,
+  "notVerified": [
+    "Hosted JWT/Auth gateway",
+    "Real multi-connection row-lock concurrency",
+    "Actual development deployment matches local source",
+    "Live network/offline reconnect"
+  ],
+  "results": [
+    {
+      "name": "all migrations compile and apply atomically",
+      "status": "PASS"
+    },
+    {
+      "name": "all 16 application/private tables enable RLS",
+      "status": "PASS"
+    },
+    {
+      "name": "unauthenticated role cannot read families",
+      "status": "PASS"
+    },
+    {
+      "name": "unpaired authenticated identity reads zero families",
+      "status": "PASS"
+    },
+    {
+      "name": "teen sees own family and no other family",
+      "status": "PASS"
+    },
+    {
+      "name": "parent cannot create occurrence in another family",
+      "status": "PASS"
+    },
+    {
+      "name": "teen cannot elevate membership role",
+      "status": "PASS"
+    },
+    {
+      "name": "teen cannot insert XP events",
+      "status": "PASS"
+    },
+    {
+      "name": "clients cannot read invitation hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "clients cannot invoke internal issuer",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous identity cannot create a parent family",
+      "status": "PASS"
+    },
+    {
+      "name": "API v1 handshake available only to authenticated users",
+      "status": "PASS"
+    },
+    {
+      "name": "occurrence is stable across retries",
+      "status": "PASS"
+    },
+    {
+      "name": "submission retry reuses request and submission identity",
+      "status": "PASS"
+    },
+    {
+      "name": "new request cannot create second submission for same slot",
+      "status": "PASS"
+    },
+    {
+      "name": "teen cannot approve its own submission",
+      "status": "PASS"
+    },
+    {
+      "name": "other-family parent cannot approve",
+      "status": "PASS"
+    },
+    {
+      "name": "two parents sequentially converge on one decision",
+      "status": "PASS"
+    },
+    {
+      "name": "approval retry returns exact original receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "decision, zero-mint contribution and outbox occur once",
+      "status": "PASS"
+    },
+    {
+      "name": "cross-family submission, decision and contribution reads return zero",
+      "status": "PASS"
+    },
+    {
+      "name": "same request ID with different payload is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "late new submission is rejected without award",
+      "status": "PASS"
+    },
+    {
+      "name": "published day blocks new approval but retains old receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "initial catch-up is idempotent and excludes future ranges",
+      "status": "PASS"
+    },
+    {
+      "name": "initial rules cannot silently be changed",
+      "status": "PASS"
+    },
+    {
+      "name": "new parent creates 28 seeded duty variants",
+      "status": "PASS"
+    },
+    {
+      "name": "teen cannot issue codes",
+      "status": "PASS"
+    },
+    {
+      "name": "pairing code is hashed at rest and single-use across identities",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous identity cannot redeem a parent invitation",
+      "status": "PASS"
+    },
+    {
+      "name": "expired code is rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "invalid-code rate counter commits through denials",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked teen loses access and replacement preserves stable actor",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked parent loses access; last-parent removal is blocked",
+      "status": "PASS"
+    },
+    {
+      "name": "no health/cycle payload columns in synchronized schema",
+      "status": "PASS"
+    }
+  ]
+}

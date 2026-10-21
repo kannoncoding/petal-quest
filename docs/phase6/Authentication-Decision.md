@@ -1,0 +1,13 @@
+# Phase 6 authentication foundation
+
+2026-10-20. Current development path: existing separately provisioned parent email/password accounts and anonymous teen Auth identities enrolled through parent-authorized single-use codes. The app selector is presentation only; server membership grants authority. No SMS provider or paid email service is required for the existing fictional sign-in trial.
+
+Google OAuth was evaluated as the next parent sign-in option. It avoids dependence on signup/reset email delivery, but needs Google provider credentials, consent configuration and a reviewed mobile redirect/PKCE flow. Those external settings are not present, so Google sign-in is not falsely shown as available. The provider secret belongs in Supabase configuration, never the APK. No OAuth credential was created or requested in chat. See [Supabase Google sign-in](https://supabase.com/docs/guides/auth/social-login/auth-google?platform=android) and [mobile redirects](https://supabase.com/docs/guides/auth/native-mobile-deep-linking).
+
+Existing parent password sign-in does not prove signup or reset-email delivery. Supabase's default mail service restricts recipients and volume; no working public reset/signup flow is claimed. Production parent recovery needs a configured provider/recovery strategy. See [Supabase SMTP guidance](https://supabase.com/docs/guides/auth/auth-smtp).
+
+An anonymous teen has a real Auth identity and authenticated JWT, not an unauthenticated API key. The identity receives no family/parent authority until a parent-issued teen code is redeemed. Invalid codes preserve the current anonymous session for retry rather than silently granting membership. Parent-only operations also require a permanent Auth identity and current parent membership. See [anonymous identities](https://supabase.com/docs/guides/auth/auth-anonymous).
+
+Clearing the teen's session/device loses that anonymous identity's local access. A parent can revoke it and issue a replacement code for the same stable teen actor; family task history stays attached to the actor. This does not restore local health records to another identity/device. General parent-account recovery and restoring the same revoked identity are not yet implemented. Do not use logout as a health-data recovery mechanism.
+
+Development anonymous signup must be enabled in the development console. Per-identity database attempt limits are implemented; platform signup rate controls and CAPTCHA support need separate production hardening because rotating anonymous identities can evade a per-user counter. No production Auth settings were changed.

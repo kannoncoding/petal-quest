@@ -1,0 +1,5 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="46dp" android:height="46dp" android:gravity="center">
+        <bitmap android:src="@drawable/petal_quest_parents" android:gravity="fill" android:filter="true" />
+    </item>
+</layer-list>

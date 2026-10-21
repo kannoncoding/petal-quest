@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-10-21T17:09:14.222Z",
+  "scope": "Dedicated QA P6 families only; public key; dedicated parent logins and new anonymous fixture identities",
+  "results": [
+    {
+      "name": "parent A authentication",
+      "status": "PASS"
+    },
+    {
+      "name": "parent B authentication",
+      "status": "PASS"
+    },
+    {
+      "name": "parent C authentication",
+      "status": "PASS"
+    },
+    {
+      "name": "paired own and cross-family reads",
+      "status": "PASS"
+    },
+    {
+      "name": "paired role and XP writes denied",
+      "status": "PASS"
+    },
+    {
+      "name": "submission replay and duplicate are idempotent",
+      "status": "PASS"
+    },
+    {
+      "name": "teen and cross-family approvals denied",
+      "status": "PASS"
+    },
+    {
+      "name": "separate concurrent parent HTTPS approvals produce one award",
+      "status": "PASS"
+    },
+    {
+      "name": "populated paired work isolation in both directions",
+      "status": "PASS"
+    },
+    {
+      "name": "revocation denies old JWT and replacement preserves actor",
+      "status": "PASS"
+    },
+    {
+      "name": "private outbox uniqueness",
+      "status": "UNVERIFIED",
+      "reason": "Run generated read-only owner audit separately"
+    }
+  ]
+}

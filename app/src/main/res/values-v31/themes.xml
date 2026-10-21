@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PetalQuest" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#101520</item>
+        <item name="android:statusBarColor">#101520</item>
+        <item name="android:navigationBarColor">#101520</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowSplashScreenBackground">#101520</item>
+        <!-- The full, unmasked logo is drawn by the first activity frame. -->
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/pq_splash_transparent</item>
+    </style>
+</resources>

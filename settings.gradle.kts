@@ -24,3 +24,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Petal Quest"
 include(":app")
+
+include(":parent", ":core:model", ":core:network", ":core:data", ":core:ui")
+include(":verification")
+include(":liveVerification")

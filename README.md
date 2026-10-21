@@ -1,41 +1,34 @@
-# Petal Quest Android starter
+# Petal Quest Android
 
-This is the Phase 2 Kotlin/Jetpack Compose starter. Debug builds open a development-only Firebase connection/notification check; release builds retain the placeholder greeting. Product features and the separate teen/parent application modules are scheduled for later phases.
+Separate Teen and Parent applications with shared Kotlin/Compose and Java/Room modules. Phase 6 development foundation is accepted as complete (2026-10-21); see docs/phase6/Completion-Report.md for evidence and limitations.
 
-## Verified development toolchain
+## Modules
 
-- Android Studio 2026.2.1, bundled JDK 25.0.3.
-- Gradle wrapper 9.6.0 with distribution SHA256 pinned.
-- Android Gradle Plugin 9.4.1; Kotlin Compose plugin 2.2.10.
-- Compose BOM 2026.02.01; compile/target API 37; minimum API 24.
-- Google services plugin 4.5.0; Firebase BOM 35.0.2; Messaging SDK only.
+- app: Teen, petalquest.teen.dev in debug.
+- parent: Parent, petalquest.parent.dev in debug.
+- core:model, core:network, core:data, core:ui: shared contracts, HTTPS transport, account-scoped encrypted sessions, Room cache/queue and family access UI.
+- supabase: ordered migrations, fresh-install bundle and synthetic verification tooling.
+- verification: isolated offline Android storage instrumentation.
+- liveVerification: separate development-only manual network/retry helper; not a product app.
 
-The wrapper and version catalog are the source for build versions. Use Android Studio's compatible bundled JDK; the computer's shell default Java can differ.
+## Build
 
-## Build on Windows
+Open this folder in Android Studio and sync Gradle, or use `tools/Build-Debug.ps1 -IncludeParent`. The helper builds, without running test tasks, using Android Studio's bundled JDK. APKs are under app/build/outputs/apk/debug and parent/build/outputs/apk/debug.
 
-Open this directory in Android Studio, let Gradle synchronization finish, and build the app. Alternatively, run from PowerShell:
+Current configured toolchain is declared in the wrapper/version catalog: compile/target API 37, production-app minimum API 24, Java 11 source, AGP 9.4.1 and Compose plugin 2.2.10. Verification helpers have their own documented minimums.
 
-```powershell
-.\tools\Build-Debug.ps1
-```
+## Local configuration
 
-For a different Android Studio location, pass `-StudioDirectory 'C:\your\Android Studio'`. The helper temporarily selects Studio's bundled JDK and a short Java socket directory inside the ignored `.gradle` cache, then restores the process environment. This fixes the Java selector startup error observed in the automation environment without modifying system settings.
+No real configuration or credentials are tracked. Copy configuration-examples/supabase/development.example.json to ../Configuration/Supabase/development.local.json and fill only the development publishable key. Never use an administrator/service-role key in an app. service-config.gradle.kts reads the sibling Configuration directory and pins development/production endpoints; unconfigured live access stays disabled. Staging requires explicit separate matching service/Firebase configuration.
 
-The output is `app\build\outputs\apk\debug\app-debug.apk`. It is a debug-signed starter for toolchain checks; production signing comes later. Building requires the installed SDK and access to dependency repositories or their cached artifacts.
+Place Firebase client files in app/src/debug/google-services.json and parent/src/debug/google-services.json with their matching petalquest.teen.dev and petalquest.parent.dev registrations. Release client files use the matching release IDs. Keep signing material, passwords, session tokens, database exports and private health data outside Git.
 
-Firebase client configuration is supplied locally and ignored by Git. For a fresh checkout, download `google-services.json` from Firebase project **petal-quest-dev**, ensuring it includes Android ID **petalquest.teen.dev**, and save it at `app/src/debug/google-services.json`. Release configuration belongs at `app/src/release/google-services.json` from project **petal-quest**, matching **petalquest.teen**. Both files are already installed on the owner's current workstation. The namespace remains `com.example.petalquest`; the installed application IDs use the registered `petalquest.teen` names.
+## Accepted development foundation
 
-## Physical-device check
+Both configured apps built and installed. Owner confirmed Test Family 1 enrollment for two parents and a teen. Recorded verification includes 10 Android instrumentation cases, 35 local PostgreSQL checks, 13 live unpaired checks, 10 hosted paired groups, owner-console private-outbox counts and owner-confirmed Samsung offline process-restart/reconciliation/replay. Keep each evidence source distinct; see docs/phase6.
 
-Enable USB debugging on the unlocked phone, connect a data cable, and authorize this computer. Select the phone in Android Studio and run `app`. The Phase 2 exit check still requires a real-phone launch and actual cloud authorization/FCM checks.
+The development schema and receipt repair were deployed. supabase/deploy-development.sql is for a fresh database and refuses an existing schema: never rerun it to repair an existing installation. Apply forward migrations only. The local Auth fixture in supabase/review is exclusively for a disposable local database, never hosted Supabase.
 
-In the debug setup screen, allow notifications, obtain and copy the test token, and send a Firebase console test to that device while this app is in the background. Tokens are kept in memory and copied only on request; they are not logged or displayed in screenshots. The setup screen uses the documented console-compatible registration-token API; current FCM SDKs also offer newer Installation ID registration, which needs review when building production device registration.
+Phase 5 launcher/splash, UI icons, empty states and dog animations are integrated. Source asset masters and broader phase documents remain in the sibling Images and Documentation folders; they are not yet all included in this repository. Preserve that workspace backup too.
 
-Official setup reference: https://firebase.google.com/docs/android/setup. Console test procedure: https://firebase.google.com/docs/cloud-messaging/android/get-started#send_a_notification_message.
-
-## Repository hygiene
-
-Keep SDK paths, signing material, administrative credentials and real family/health records outside Git. `.gitignore` excludes local settings, build caches, environment-specific Firebase files, keys, databases and designated private folders. Only fictional data belongs in development fixtures; review every staged file before pushing. Supabase live authorization remains unverified.
-
-The starter retains Android's template backup configuration. Implement and verify sensitive-data exclusions before adding private cycle storage.
+Production deployment and other family-phone compatibility are deferred. Full product quests/rewards/finalization, health logging/locking and reminder delivery are later phases; approval currently records raw contribution and never mints spendable XP/coins directly. Tests use fictional development fixtures, which remain as evidence. Real Teen/Parent sessions were not cleared for verification.

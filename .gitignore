@@ -56,3 +56,13 @@ exports/private/
 *.db-wal
 *.sqlite
 *.sqlite3
+
+# Phase 6 local-only configuration
+*.local.json
+*.local.log
+**/node_modules/
+
+# Local live verification fixtures, reports and generated owner audit
+/supabase/tests/phase6-backend-fixtures.json
+/supabase/tests/phase6-live-acceptance-results.json
+/supabase/tests/phase6-outbox-owner-audit.sql

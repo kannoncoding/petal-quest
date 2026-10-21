@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android" android:oneshot="true">
+    <item android:drawable="@drawable/pq_dog_celebrate_00" android:duration="125" />
+    <item android:drawable="@drawable/pq_dog_celebrate_01" android:duration="125" />
+    <item android:drawable="@drawable/pq_dog_celebrate_02" android:duration="125" />
+    <item android:drawable="@drawable/pq_dog_celebrate_03" android:duration="125" />
+    <item android:drawable="@drawable/pq_dog_celebrate_04" android:duration="125" />
+    <item android:drawable="@drawable/pq_dog_celebrate_05" android:duration="125" />
+    <item android:drawable="@drawable/pq_dog_celebrate_06" android:duration="125" />
+    <item android:drawable="@drawable/pq_dog_celebrate_07" android:duration="125" />
+</animation-list>

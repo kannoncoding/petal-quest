@@ -25,6 +25,9 @@ android {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
         }
+        create("staging") {
+ initWith(getByName("debug")); applicationIdSuffix = ".staging"; matchingFallbacks += "debug"
+ }
         release {
             optimization {
                 enable = true
@@ -42,7 +45,17 @@ android {
     }
 }
 
+apply(from = rootProject.file("service-config.gradle.kts"))
+@Suppress("UNCHECKED_CAST")
+val serviceSettings = extra["publicServiceSettings"] as Map<String, Pair<String, String>>
+android.buildTypes.configureEach {
+ val (url, key) = serviceSettings[name] ?: ("" to "")
+ buildConfigField("String", "SERVICE_URL", groovy.json.JsonOutput.toJson(url))
+ buildConfigField("String", "SERVICE_PUBLIC_KEY", groovy.json.JsonOutput.toJson(key))
+}
+androidComponents { beforeVariants(selector().withBuildType("staging")) { it.enable = rootProject.file("../Configuration/Supabase/staging.local.json").isFile && rootProject.file("../Configuration/Firebase/Staging/google-services.json").isFile } }
 dependencies {
+ implementation(project(":core:ui"))
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
     implementation(platform(libs.androidx.compose.bom))

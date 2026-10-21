@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-21T16:04:41.186Z",
+  "scope": "Real development HTTPS API; public key and one newly created unpaired anonymous verification identity. No existing user credentials or app data read.",
+  "probe": "One anonymous Auth row created, signed out after checks; no family membership or scoring rows created.",
+  "passed": 13,
+  "failed": 0,
+  "notVerified": [
+    "Paired cross-family records",
+    "Valid concurrent parent approval",
+    "Paired identity revocation/recovery"
+  ],
+  "results": [
+    {
+      "name": "unauthenticated family reads denied",
+      "status": "PASS"
+    },
+    {
+      "name": "unauthenticated membership reads denied",
+      "status": "PASS"
+    },
+    {
+      "name": "private schema not exposed to API",
+      "status": "PASS"
+    },
+    {
+      "name": "unpaired anonymous JWT reaches contract v1",
+      "status": "PASS"
+    },
+    {
+      "name": "unpaired JWT sees zero families",
+      "status": "PASS"
+    },
+    {
+      "name": "unpaired JWT sees zero memberships",
+      "status": "PASS"
+    },
+    {
+      "name": "unpaired JWT sees zero task_occurrences",
+      "status": "PASS"
+    },
+    {
+      "name": "unpaired JWT sees zero xp_events",
+      "status": "PASS"
+    },
+    {
+      "name": "unpaired teen cannot become a parent through family creation",
+      "status": "PASS"
+    },
+    {
+      "name": "direct membership role changes denied",
+      "status": "PASS"
+    },
+    {
+      "name": "direct XP writes denied",
+      "status": "PASS"
+    },
+    {
+      "name": "teen approval RPC denied",
+      "status": "PASS"
+    },
+    {
+      "name": "unpaired identity cannot read pairing hashes",
+      "status": "PASS"
+    }
+  ]
+}
