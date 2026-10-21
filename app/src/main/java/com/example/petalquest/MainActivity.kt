@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
                     var showFamily by remember { mutableStateOf(false) }
                     if (showFamily || !BuildConfig.DEBUG) {
                         Column(modifier = Modifier.padding(innerPadding)) {
+                            OutlinedButton(onClick = { startActivity(android.content.Intent(this@MainActivity, com.example.petalquest.health.PrivateCycleActivity::class.java)) }) { Text("Private cycle log") }
                             if (BuildConfig.DEBUG) OutlinedButton(onClick = { showFamily = false }) { Text("Back to development previews") }
                             com.petalquest.core.ui.FamilyAccessScreen(false, com.petalquest.core.model.ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE), localData)
                         }
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
                             Phase5AssetPreview(lifecycle = this@MainActivity.lifecycle, onBack = { showAssets = false }, modifier = Modifier.padding(innerPadding))
                         } else {
                             Column(modifier = Modifier.padding(innerPadding)) {
+                                OutlinedButton(onClick = { startActivity(android.content.Intent(this@MainActivity, com.example.petalquest.health.PrivateCycleActivity::class.java)) }) { Text("Private cycle log") }
                                 OutlinedButton(onClick = { showFamily = true }) { Text("Family service access") }
                                 OutlinedButton(onClick = { showAssets = true }) { Text("Phase 5 asset visual review") }
                                 Phase2SetupScreen(modifier = Modifier.weight(1f))

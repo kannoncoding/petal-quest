@@ -55,6 +55,7 @@ android.buildTypes.configureEach {
 }
 androidComponents { beforeVariants(selector().withBuildType("staging")) { it.enable = rootProject.file("../Configuration/Supabase/staging.local.json").isFile && rootProject.file("../Configuration/Firebase/Staging/google-services.json").isFile } }
 dependencies {
+ implementation(project(":core:health"))
  implementation(project(":core:ui"))
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)

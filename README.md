@@ -32,3 +32,7 @@ The development schema and receipt repair were deployed. supabase/deploy-develop
 Phase 5 launcher/splash, UI icons, empty states and dog animations are integrated. Source asset masters and broader phase documents remain in the sibling Images and Documentation folders; they are not yet all included in this repository. Preserve that workspace backup too.
 
 Production deployment and other family-phone compatibility are deferred. Full product quests/rewards/finalization, health logging/locking and reminder delivery are later phases; approval currently records raw contribution and never mints spendable XP/coins directly. Tests use fictional development fixtures, which remain as evidence. Real Teen/Parent sessions were not cleared for verification.
+
+## Phase 7 implementation
+
+The Teen app now includes a private cycle activity and a separate core:health encrypted local vault, phone authentication/relocking, calendar/history/optional observations, encrypted passphrase export and explicit health deletion. Parent has no core:health dependency. Both debug builds compile; the Teen update is installed on the Samsung. Static privacy QA passed after corrections. Phone feature acceptance is still pending, and no new automated Phase7 tests were run. See docs/phase7/Owner-Actions.md and Build-and-Privacy-Review.md. No Phase7 completion or restore interoperability is claimed.
