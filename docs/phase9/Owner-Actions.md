@@ -1,4 +1,4 @@
-# Phase 9 next owner actions — 22 October 2026
+# Phase 9 owner actions — complete,22 October2026
 
 ## Completed
 
@@ -9,7 +9,7 @@
 - GitHub code/test-report push approved and completed: a4c6554. Subsequent acceptance report updates will use the same authorization.
 - SMTP and app email recovery deferred by owner for private family use; recovery UI hidden. No email provider setup needed.
 
-## Current final phone checks
+## Final phone checks — all owner-confirmed passed
 
 Use only fictional Test Family1 on the same Samsung. No second phone or new cloud account is needed for this group.
 
@@ -18,7 +18,7 @@ Use only fictional Test Family1 on the same Samsung. No second phone or new clou
 3. Test affordable reward approval and cancellation before fulfillment: saved price debited/refunded once; earned XP unchanged by spending. A manually confirmed fictional400-XP achievement can fund the fixture if needed.
 4. Refresh Parent; disconnect internet; close/reopen. Cached facts must be labeled saved and decisions unavailable. Reconnect/refresh to restore current facts. Do not uninstall or clear data.
 
-Report each result or sanitized error. Owner-Walkthrough.md contains the exact longer screen guide; Acceptance-Report.md records evidence and limits.
+Owner confirmed all four checks passed. No further owner action is required for the agreed Phase9 scope. Owner-Walkthrough.md retains the regression steps; Acceptance-Report.md records evidence and limits.
 
 ## Retained verification limits
 

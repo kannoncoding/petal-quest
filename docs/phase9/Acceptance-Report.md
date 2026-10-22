@@ -1,6 +1,6 @@
 # Phase 9 acceptance report — 22 October 2026
 
-Status: in progress. Do not treat build, installation, schema flags or source review as live functional acceptance.
+Status: COMPLETE for the agreed development/family scope, accepted22 October2026. Build, source review, live HTTPS checks, owner-console fixtures and physical observations remain separately identified below; no stronger evidence is inferred.
 
 ## Confirmed evidence
 
@@ -68,3 +68,15 @@ Owner explicitly approved commit/push to GitHub main; code and safe reports may 
 Owner supplied all8 distinct check_name/passed rows, each true. The deployed resolver selected the synthetic effective451 reward price while original request/replay stayed450; both public approvals debited their saved prices once and preserved earned XP. Parent/Teen routine selection respected absent/current/archived dates and immutable versions. A new empty QA actor materialized100 task points using activated versions/title; both dashboards agreed. Original baseline occurrence snapshots and authoritative manifest stayed byte-equivalent; deferred constraints passed. The complete fixture ends with ROLLBACK. This proves controlled effective-record resolution and materialization; literal midnight/calendar-cutover and HTTPS gateway behavior are not inferred.
 
 Database acceptance evidence is now recorded for both live HTTPS batches, baseline outbox, revoked Parent DB authority, synthetic real-clock sealing and controlled activation/saved prices. Remaining requested phone walkthrough: deduction/reversal, Parent-edit/Teen-read shared note, reward debit/refund with earned history preserved, and saved/read-only Parent offline restart/reconnect. Same Samsung sufficient; no additional account/cloud setup requested.
+## Phase 9 completion — owner final walkthrough passed
+
+Owner explicitly reported all four final Parent phone checks passed:
+
+- 5-point dirty-lunchbag deduction updated both apps; reasoned reversal restored original totals.
+- Parent reflection note was visible to Teen with no edit control.
+- Affordable reward approval and cancellation before fulfillment debited/refunded its saved price once; spending preserved earned XP. Any achievement funding was fictional; no cash transfer or other-app permission change was performed.
+- Parent offline close/reopen labeled cached information saved/read-only, disabled decisions and restored current information after reconnect/refresh. No uninstall or data clearing was required.
+
+Combined with accepted review/publication display, two passing live service batches and passing outbox/revocation/seal/activation fixtures, this completes the agreed Phase9 development/family scope. The Parent-dependent Phase8 accounting/review integration is covered by these recorded methods. No additional owner setup or phone is needed to close this scope.
+
+Retained limits: the revocation fixture is database role/claims evidence rather than a real signed-JWT HTTP replay; deadline enforcement used a synthetic five-second seal rather than normal midnight; activation used controlled effective rows rather than observing midnight passage; separate-process receipt replay used Node rather than an Android lost-response injection. Mixed stale/failure UI batch, full multi-month Parent navigation, other family phones/Android versions and a Teen appeal-button device walkthrough were not separately observed. These limits do not become claimed passes. Production deployment, broader business push/reminders (Phase10), portable restore (Phase11) and owner-deferred email recovery are outside this completed scope.

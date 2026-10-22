@@ -1,6 +1,6 @@
 # Phase 9 status — 22 October 2026
 
-Status: prepared locally, both APKs built, source-reviewed. Development SQL upgrade confirmed by the owner on 22 October 2026: all five schema flags true. Both updated APKs installed in place on the connected Samsung on 22 October 2026; ADB reported Success for each. Existing app data retained. Functional acceptance is in progress; Phase9 remains open.
+Status: COMPLETE for the agreed development/family scope on 22 October 2026. Implementation, development upgrades, both APK installations, live service checks, controlled owner-console fixtures and final Samsung walkthrough accepted. Existing data retained. Email recovery is explicitly owner-deferred. Verification limits below are retained; no production deployment is claimed.
 
 ## Prepared implementation
 
@@ -47,5 +47,9 @@ Approved-bonus reversal and reopening cancelled offers are unavailable pending e
 - Owner phone return/note/resubmission/approval now matches in both apps. Approval alone leaves XP/coins unchanged. Owner published78 actual points (correctly0 earned), then confirmed all published information displays correctly in both apps while submitting further work. Do not invent an unreported final total.
 - Latest Teen Quests screen includes today's published result card and link to full history; Gradle build passed and APK installed in place. Latest complete hashes are above. Parent error feedback and foreground refresh are installed. No app data was cleared.
 - Owner rollback-only results: revoked Parent DB authority10/10 true; synthetic sealing14/14 true. Controlled activation/saved-price fixture passed8/8 true. Remaining: final staged Parent phone observations (deduction/reversal, notes, reward debit/refund and offline restart/reconnect). These fixtures use temporary result tables with explicit RLS. Run whole scripts through ROLLBACK; the SQL-editor auto-RLS wrapper is unnecessary.
-- GitHub commit/push explicitly approved by owner. Phase9 remains open until remaining required evidence is recorded.
-Database evidence is complete to the documented method limits. Final Parent phone walkthrough is pending; Phase9 is not yet marked complete.
+- GitHub commit/push explicitly approved by owner. Final required Parent phone evidence has now been supplied; Phase9 is complete to the documented scope and verification limits.
+Database evidence is complete to the documented method limits. Owner confirmed all four final Parent phone checks passed. Phase9 is complete to the documented scope and verification limits.
+
+## Final owner acceptance
+
+Owner confirmed all final checks passed: deduction/reversal restored totals, Parent reflection was Teen-readable without editing, reward approval/cancellation debited/refunded once without reducing earned XP, and Parent offline close/reopen showed saved read-only facts then refreshed correctly after reconnection. No required owner action remains for this Phase9 scope. See Acceptance-Report.md for exact evidence and method limits. Phase10 notification/synchronization work has not started.
