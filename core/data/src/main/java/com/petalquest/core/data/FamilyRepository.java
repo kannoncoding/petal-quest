@@ -13,7 +13,7 @@ import org.json.JSONException;
 /** Local family data only. No network client or health reference exists in this class. */
 public final class FamilyRepository {
     public enum CacheKind { FAMILY, QUESTS, REWARDS, REVIEWS, REMINDERS }
-    public enum OperationKind { QUEST_CREATE, QUEST_UPDATE, QUEST_SUBMIT, REMINDER_SAVE, APPEAL_SUBMIT, REWARD_REQUEST, REWARD_CANCEL, EXTRA_OUTCOME_REQUEST, DAY_APPEAL_REQUEST }
+    public enum OperationKind { QUEST_CREATE, QUEST_UPDATE, QUEST_SUBMIT, REMINDER_SAVE, APPEAL_SUBMIT, REWARD_REQUEST, REWARD_CANCEL, EXTRA_OUTCOME_REQUEST, DAY_APPEAL_REQUEST, BONUS_SUBMIT }
     private final FamilyDatabase database;
     private final SessionStore sessions;
     private final String user;
@@ -81,6 +81,7 @@ public final class FamilyRepository {
             case REWARD_CANCEL: allowed=new String[]{"reward_request_id"}; break;
             case EXTRA_OUTCOME_REQUEST: allowed=new String[]{"kind","outcome_key","target_date","reason"}; break;
             case DAY_APPEAL_REQUEST: allowed=new String[]{"local_date","reason"}; break;
+            case BONUS_SUBMIT: allowed=new String[]{"bonus_id"}; break;
             default: throw new IllegalArgumentException("Unsupported family operation");
         }
         Set<String> fields=new HashSet<>(Arrays.asList(allowed));

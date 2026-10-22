@@ -25,7 +25,9 @@ import org.json.JSONObject
 
 @Composable
 fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: LocalData, modifier: Modifier = Modifier,
- teenContent: (@Composable (Membership, Session, FamilyService, suspend () -> String) -> Unit)? = null) {
+ teenContent: (@Composable (Membership, Session, FamilyService, suspend () -> String) -> Unit)? = null,
+ parentContent: (@Composable (Membership, Session, FamilyService, suspend () -> String) -> Unit)? = null,
+ parentRecovery: (@Composable () -> Unit)? = null) {
  val scope = rememberCoroutineScope()
  val context = LocalContext.current
  val service = remember(config) { FamilyService(config) }
@@ -100,6 +102,7 @@ fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: Loca
     OutlinedTextField(email,{email=it},label={Text("Email")},singleLine=true)
     OutlinedTextField(password,{password=it},label={Text("Password")},visualTransformation=PasswordVisualTransformation(),singleLine=true)
     Button(enabled=!busy && email.isNotBlank() && password.isNotBlank(),onClick={action { try { save(service.signIn(email.trim(),password)); reload() } finally { password="" } }}) {Text("Sign in")}
+    parentRecovery?.invoke()
     Text("Use your provisioned parent account. Account registration and email confirmation are managed separately.")
    } else {
     OutlinedTextField(code,{code=it},label={Text("Parent's pairing code")},singleLine=true)
@@ -120,6 +123,7 @@ fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: Loca
     OutlinedTextField(code,{code=it},label={Text("Parent invitation code")})
     Button(enabled=!busy && code.isNotBlank(),onClick={action { val result=service.rpc("accept_parent_invite",token(),JSONObject().put("p_code",code.trim()));reload();check(memberships.any { it.familyId==result.getString("family_id") && it.role=="parent" }) { "Membership could not be verified. Refresh family access." };code="";message="Invitation accepted." }}) {Text("Accept parent invitation")}
     if(memberships.any { it.familyId==selectedFamily && it.role=="parent" }) {
+     memberships.firstOrNull { it.familyId==selectedFamily && it.role=="parent" }?.let { member -> key(member.familyId,session!!.userId,session!!.generation) { parentContent?.invoke(member,session!!,service,{ token() }) } }
      key(selectedFamily, session!!.userId, config.url) { ParentHealthControls(service, selectedFamily, { token() }, !busy) }
      listOf("Invite parent" to "issue_parent_invite", "Pair teen" to "issue_teen_pairing").forEach { (label,rpc) ->
       Button(enabled=!busy,onClick={action { val result=service.rpc(rpc,token(),JSONObject().put("p_family_id",selectedFamily));issuedCode=result.getString("code");message="Code expires: " + result.getString("expires_at") }}) {Text(label)}

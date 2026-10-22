@@ -8,6 +8,7 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URI
 
+class FamilyServiceRejected(val statusCode: Int, message: String): IllegalStateException(message)
 class FamilyService(private val config: ServiceConfig) {
  @Volatile private var contractAccepted = false
  private suspend fun requireContract(token: String) {
@@ -32,7 +33,29 @@ class FamilyService(private val config: ServiceConfig) {
     connection.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
    }
    val status = connection.responseCode
-   if (status !in 200..299) throw IllegalStateException(when(status) {
+   if (status !in 200..299) {
+    val detail=connection.errorStream?.bufferedReader()?.use { it.readText() }.orEmpty()
+    val code=try { JSONObject(detail).optString("message") } catch(e: Exception) { "" }
+    val known=when(code) {
+     "negative_correction_debt_policy_required" -> "This correction could not be completed. Refresh the current balance and try again."
+     "stale_note_refresh_required", "stale_day_revision_refresh_required", "stale_review_refresh_required", "stale_catalogue_refresh_required", "stale_revision_refresh_required", "version_conflict", "outcome_already_resolved" -> "Another decision changed this item. Refresh and review its latest state."
+     "day_sealed", "result_sealed", "sealed_day", "appeal_expired", "day_seal_reached" -> "This day has sealed. Its result can no longer change."
+     "insufficient_coins", "insufficient_balance" -> "There are not enough available coins for this approval."
+     "invalid_history_range" -> "Enter a valid history date."
+     "future_effective_date_required", "effective_date_must_be_future" -> "Choose an effective date after today in Costa Rica."
+     "pending_reviews_require_resolution", "pending_reviews_exist", "pending_submissions_require_review" -> "Resolve all pending submissions before publishing this day."
+     "explicit_cash_amount_and_reason_required", "cash_amount_and_note_required", "reason_required", "note_required" -> "Enter the required amount and reason before confirming."
+     "day_taskset_must_total_100", "catalogue_day_must_total_100:0", "catalogue_day_must_total_100:1", "catalogue_day_must_total_100:2", "catalogue_day_must_total_100:3", "catalogue_day_must_total_100:4", "catalogue_day_must_total_100:5", "catalogue_day_must_total_100:6", "daily_total_must_be_100", "catalogue_daily_total_must_be_100", "invalid_catalogue_total" -> "The enabled duties must total 100 points on every day."
+     "approved_appeal_requires_corrected_revision" -> "Apply the justified correction first, then accept the appeal against the updated result."
+     "submitted_bonus_required" -> "The teen must submit completed bonus work before you review it."
+     "excused_occurrence_required" -> "Bonus work is available only for an excused duty."
+     "bonus_already_resolved", "appeal_already_resolved", "deduction_already_reversed" -> "This item was already resolved. Refresh to see the latest decision."
+     "approved_bonus_correction_unavailable" -> "This duty has an approved bonus conversion and cannot be changed through an ordinary correction."
+     "invalid_due_time", "invalid_deadline" -> "Enter a deadline in HH:mm format."
+     "bonus_window_closed", "bonus_deadline_passed" -> "The time allowed for this bonus has ended."
+     else -> null
+    }
+    throw FamilyServiceRejected(status,known ?: when(status) {
     401 -> "Session expired or credentials rejected. Sign in again."
     403 -> "Your account cannot perform this action."
     404 -> "Family service setup is not complete yet."
@@ -40,6 +63,7 @@ class FamilyService(private val config: ServiceConfig) {
     429 -> "Too many attempts. Wait and try again."
     else -> "Service rejected the request (HTTP " + status + "). No change confirmed."
    })
+   }
    connection.inputStream.bufferedReader().use { it.readText() }
   } finally { connection.disconnect() }
  }
@@ -48,6 +72,7 @@ class FamilyService(private val config: ServiceConfig) {
   return AuthSession(json.getJSONObject("user").getString("id"), json.getString("access_token"), json.getString("refresh_token"), System.currentTimeMillis()/1000 + json.optLong("expires_in",3600))
  }
  suspend fun signIn(email: String, password: String) = session(JSONObject(request("/auth/v1/token?grant_type=password",null,JSONObject().put("email",email).put("password",password))))
+ suspend fun recoverPassword(email: String) { request("/auth/v1/recover",null,JSONObject().put("email",email)) }
  suspend fun anonymousSignIn() = session(JSONObject(request("/auth/v1/signup",null,JSONObject())))
  suspend fun refresh(refreshToken: String) = session(JSONObject(request("/auth/v1/token?grant_type=refresh_token",null,JSONObject().put("refresh_token",refreshToken))))
  suspend fun memberships(token: String, userId: String): List<Membership> {
@@ -59,7 +84,7 @@ class FamilyService(private val config: ServiceConfig) {
  suspend fun rpc(name: String, token: String, args: JSONObject): JSONObject {
   requireContract(token)
   require(name in setOf("create_family","issue_parent_invite","issue_teen_pairing","accept_parent_invite","redeem_teen_pairing","create_occurrence","reconcile_occurrences","submit_occurrence","approve_submission","revoke_membership","issue_teen_replacement","register_device",
-   "get_teen_dashboard", "materialize_teen_tasks", "request_reward", "cancel_reward_request", "request_extra_outcome", "request_day_appeal",
+   "correct_occurrence", "offer_bonus", "submit_bonus", "review_bonus", "reverse_deduction", "save_reflection_note", "save_task_catalogue", "confirm_cash_outcome", "review_submission_checked", "get_parent_dashboard", "review_submission", "finalize_complete_day", "enter_deduction", "review_extra_outcome", "review_reward_request", "approve_reward_request", "save_catalogue_version", "resolve_day_appeal", "get_teen_dashboard", "materialize_teen_tasks", "request_reward", "cancel_reward_request", "request_extra_outcome", "request_day_appeal",
    "register_health_installation", "list_health_installations", "request_wipe", "list_pending_wipes", "claim_wipe", "acknowledge_wipe",
    "upsert_period_range", "delete_period_range", "list_period_ranges", "submit_high_pain_checkin", "list_parent_checkins", "get_checkin_policy"))
   val result = JSONObject(request("/rest/v1/rpc/" + name,token,args))

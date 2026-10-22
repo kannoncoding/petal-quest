@@ -78,6 +78,12 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
  suspend fun dispatch(op:PendingOperation) {
   if(op.kind==FamilyRepository.OperationKind.QUEST_SUBMIT.name) { submissions.retry(op,token());return }
   val payload=JSONObject(op.canonicalPayload)
+  if(op.kind==FamilyRepository.OperationKind.BONUS_SUBMIT.name) {
+   withContext(Dispatchers.IO) { repository.markDispatched(op.requestId) }
+   val result=service.rpc("submit_bonus",token(),JSONObject().put("p_bonus_id",payload.getString("bonus_id")).put("p_request_id",op.requestId))
+   check(result.value("request_id")==op.requestId) { "Bonus response not reconciled. Completion remains pending send." }
+   withContext(Dispatchers.IO) { repository.acknowledgeServerResult(op.requestId) };return
+  }
   if(op.kind==FamilyRepository.OperationKind.DAY_APPEAL_REQUEST.name) {
    withContext(Dispatchers.IO) { repository.markDispatched(op.requestId) }
    val result=service.rpc("request_day_appeal",token(),JSONObject().put("p_request_id",op.requestId).put("p_local_date",payload.getString("local_date")).put("p_reason",payload.getString("reason")))
@@ -119,6 +125,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
    Text("${balance.value("available_coins")} available coins · ${balance.value("earned_xp")} earned XP",style=MaterialTheme.typography.titleMedium)
    Text("Coin rank: ${balance.value("coin_rank",snapshot!!.value("coin_rank","Awaiting confirmed rank"))}")
    Text("Requests are free. Coins are charged once when a parent approves. Spending can change your coin rank; earned XP history stays.")
+   if(balance.optLong("available_coins")<0) Text("Your coin balance has debt from a corrected result. New earnings repay it. Reward approvals pause until the debt is repaid.")
   }
   if(pending.isNotEmpty()) {
    Text("Pending send · ${pending.size}",style=MaterialTheme.typography.titleMedium)
@@ -129,6 +136,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
      "QUEST_SUBMIT" -> snapshot?.rows("tasks")?.firstOrNull { it.value("id")==payload.value("occurrence_id") }?.value("title_snapshot") ?: "Task completion"
      "EXTRA_OUTCOME_REQUEST" -> "${payload.value("kind")} · ${payload.value("target_date")}"
      "REWARD_CANCEL" -> "Reward cancellation"
+     "BONUS_SUBMIT" -> "Bonus completion"
      "DAY_APPEAL_REQUEST" -> "Result appeal · ${payload.value("local_date")}"
      else -> "Reward request"
     }
@@ -151,8 +159,10 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
       Text(task.value("title_snapshot",task.value("title")),style=MaterialTheme.typography.titleMedium)
       Text("${task.value("local_date")} · ${task.value("points_snapshot")} points · due ${dueLabel(task.value("due_at"))}")
       if(dueDate(task.value("due_at"))?.before(java.util.Date())==true && task.value("status") in listOf("open","returned")) Text("Past due time · a parent decides credit after review")
-      val status=task.value("status","open")
-      Text(if(queued) "Pending send · saved locally" else when(status) { "pending","submitted","pending_review" -> "Awaiting parent review · received by server"; "approved" -> "Approved · earnings confirmed only on day finalization"; "open" -> "Ready to complete"; else -> status.replace('_',' ') })
+      val correction=data.rows("occurrence_corrections").lastOrNull { it.value("occurrence_id")==id }
+      val status=correction?.value("outcome") ?: task.value("status","open")
+      if(correction!=null) Text("Parent correction: ${correction.value("reason","")}")
+      Text(if(queued) "Pending send · saved locally" else when(status) { "pending","submitted","pending_review" -> "Awaiting parent review · received by server"; "approved" -> "Approved · earnings confirmed only on day finalization"; "excused" -> "Excused · virtual points protect the result without earning XP or coins"; "open" -> "Ready to complete"; else -> status.replace('_',' ') })
       listOf("review_note","review_notes","decision_note").forEach { field -> if(task.has(field) && !task.isNull(field)) Text("Review: ${task.value(field)}") }
       if(!task.optBoolean("submission_ready",true)) Text(when(task.value("readiness_reason")) {
        "sealed","day_sealed","result_sealed" -> "This day's result is sealed. It can no longer be changed."
@@ -164,6 +174,20 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
       }}) { Text(if(status=="returned") "Resubmit for review" else "Mark completed") }
      } }
     }
+    Text("Bonus work",style=MaterialTheme.typography.titleMedium)
+    data.rows("bonus_activities").forEach { bonus ->
+     val id=bonus.value("id")
+     val original=data.rows("tasks").firstOrNull { it.value("id")==bonus.value("occurrence_id") }
+     val sealed=data.rows("day_summaries").firstOrNull { it.value("local_date")==bonus.value("local_date",original?.value("local_date") ?: "") }?.value("status")=="sealed" || original?.optBoolean("submission_ready",true)==false
+     val queued=pending.any { it.kind=="BONUS_SUBMIT" && JSONObject(it.canonicalPayload).value("bonus_id")==id }
+     Text("${bonus.value("local_date",original?.value("local_date") ?: "Original day")} · ${bonus.value("description")} · ${bonus.value("points_snapshot")} points · ${bonus.value("status")}")
+     if(bonus.value("status") in listOf("offered","returned")) Button(enabled=!busy && !queued && !sealed,onClick={action {
+      val op=withContext(Dispatchers.IO) { repository.pending().firstOrNull { it.kind=="BONUS_SUBMIT" && JSONObject(it.canonicalPayload).value("bonus_id")==id } ?: repository.enqueue(FamilyRepository.OperationKind.BONUS_SUBMIT,JSONObject().put("bonus_id",id).toString()) }
+      dispatch(op);load()
+     }}) { Text(if(queued) "Bonus completion pending send" else if(sealed) "Original day sealed" else "Mark bonus completed") }
+    }
+    Text("Bonus completion requires parent review before the original day seals. It converts virtual protection into actual points; conversion days do not receive perfect-day doubling.")
+    data.rows("reflection_notes").filter { weekly || it.value("local_date")==today }.forEach { reflection -> Text("Parent reflection · ${reflection.value("local_date")}",style=MaterialTheme.typography.titleSmall);Text(reflection.value("text","")) }
     Text("Completion is a request for review. Parent review and finalized daily earnings are separate.")
    }
    "Rewards" -> {
@@ -213,7 +237,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
      Text("$title · ${request.value("target_date")} · ${request.value("status")}\n${request.value("reason","")}")
     }
     Text("Tracker guidance",style=MaterialTheme.typography.titleLarge)
-    Text("Benefits, cash guidance and consequences below are tracker references. Parent controls and automatic cash or privilege awards are not active here. Owner-approved actual-score earnings and conversion rules take precedence over source wording.")
+    Text("Benefits, cash guidance and consequences below are tracker references. A parent confirms benefits and records any cash amount manually. Actual-score earnings and conversion rules apply.")
     data.optJSONObject("tracker_rules")?.rows("rules")?.filter { it.value("sheet").contains("Accountability") }?.forEach { sheet ->
      val values=sheet.optJSONArray("values") ?: JSONArray()
      for(index in 0 until values.length()) {
@@ -223,9 +247,6 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
      }
     }
     Text("Coin rank uses available coins. Tracker rank catalogue: Base, Silver, Gold, Ruby, Sapphire, Emerald, Diamond. Rank thresholds await confirmed service policy when no rank is supplied.")
-    listOf("privileges","consequences","cash_policy","notes_policy").forEach { key ->
-     if(data.has(key)) Text("${key.replace('_',' ')}: ${data.get(key)}")
-    }
    }
    else -> {
     Text("Performance history",style=MaterialTheme.typography.titleLarge)
@@ -245,9 +266,14 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
       Text("Actual ${day.value("actual_score")} · virtual protection ${day.value("virtual_remaining")} · protected score ${day.value("protected_score")}")
       Text("Earned ${day.value("earned_xp")} XP · ${day.value("coins_earned")} coins · seals ${day.value("effective_seal_at")}")
       Text("Below 85 actual points earns zero. Converted virtual points never receive perfect-day doubling. The daily icon uses protected score.")
-      Text("Converted points: ${day.value("converted_points",day.value("converted_score"))} · deductions ${day.value("deduction_points")}")
-      day.rows("conversion_history").forEach { Text("Conversion: ${it.value("points")} · ${it.value("created_at")}") }
+      Text("Approved bonus points before deductions: ${day.value("converted_points",day.value("converted_score"))} · deduction points ${day.value("deduction_points")}")
+      Text("Deductions reduce points before XP is calculated. Actual points can earn XP; remaining virtual points protect the result without earning XP or coins.")
+      day.rows("conversion_history").forEach { Text("Approved bonus points before deductions: ${it.value("points")} · ${it.value("created_at")}") }
       data.rows("tasks").filter { it.value("local_date")==selectedDay }.forEach { Text("${it.value("title_snapshot",it.value("title"))} · ${it.value("status")} · ${it.value("review_note","")}") }
+      data.rows("reflection_notes").filter { it.value("local_date")==selectedDay }.forEach { reflection -> Text("Parent reflection",style=MaterialTheme.typography.titleSmall);Text(reflection.value("text","")) }
+      val dayTaskIds=data.rows("tasks").filter { it.value("local_date")==selectedDay }.map { it.value("id") }.toSet()
+      data.rows("occurrence_corrections").filter { it.value("occurrence_id") in dayTaskIds }.forEach { correction -> Text("Correction · ${correction.value("outcome")} · ${correction.value("created_at")}\n${correction.value("reason","")}") }
+      data.rows("bonus_activities").filter { it.value("occurrence_id") in dayTaskIds }.forEach { bonus -> Text("Bonus · ${bonus.value("description")} · ${bonus.value("status")} · ${bonus.value("points_snapshot")} points") }
       val submissionsForDay=data.rows("tasks").filter { it.value("local_date")==selectedDay }.map { it.value("submission_id") }.toSet()
       data.rows("review_history").filter { it.value("submission_id") in submissionsForDay }.forEach { review ->
        Text("Review · ${review.value("outcome")} · ${review.value("reviewed_at")}\n${review.value("review_note","")}")
@@ -271,10 +297,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
   snapshot?.optJSONObject("readiness")?.let { readiness ->
    Text("Availability",style=MaterialTheme.typography.titleMedium)
    val notices=mapOf(
-    "allocation_and_bonus_policy_required" to "Excused points and bonus conversion need agreed allocation rules before they can be recorded.",
-    "revision_and_evidence_policy_required" to "Appeal decisions need agreed revision and evidence rules. You can request review of a published, unsealed result.",
     "qualification_policy_required" to "A parent must confirm achievement qualifications; requests do not grant an award.",
-    "debt_policy_required" to "Corrections after spending need an agreed balance policy.",
     "effective_date_policy_required" to "Past task generation needs an agreed start date; recorded history remains available."
    )
    readiness.keys().forEach { key -> notices[readiness.value(key)]?.let { Text(it) } }
