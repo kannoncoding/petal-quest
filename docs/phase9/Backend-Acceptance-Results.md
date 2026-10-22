@@ -63,3 +63,13 @@ The review-audit repair was applied before this passing run. The previous failed
 ### Subsequent owner outbox audit
 
 Owner ran the read-only baseline-scoped audit and reported all11 aggregate boolean checks true. Every listed immutable source had exactly one event with its exact minimal payload. No duplicate topic/source or unexpected scoped event was found; the one resubmission and bonus-submission counts matched. Both anon and authenticated had0 readable private relations; outbox RLS was enabled. This closes the baseline outbox gate only, not FCM delivery or stage2-source payload auditing.
+
+## Subsequent owner-console fixtures
+
+| Fixture | Owner result | Evidence limit |
+| --- | --- | --- |
+| Revoked Parent authority |10/10 boolean checks true | Authenticated database role/claims; no real signed-JWT HTTP replay |
+| Sealing deadline |14/14 boolean checks true | Synthetic five-second deadline crossed by real clock; no normal midnight-formula execution |
+| Activated versions/saved prices |8/8 check rows true | Already-effective synthetic records; no literal midnight passage |
+
+All fixture scripts terminate with ROLLBACK and target exact fictional QA identities only. The sealing table was pasted twice initially and counted once; revocation was subsequently supplied distinctly. Activation was supplied separately with its correct two-column output. Source checks and partial results were not substituted for these observed outputs.

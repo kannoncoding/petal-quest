@@ -1,4 +1,4 @@
-# Phase 9 owner-console validation — prepared, not executed
+# Phase 9 owner-console validation — results recorded
 
 These checks target only the exact disposable QA actors recorded by the passing baseline run. They are not app migrations. Do not run initial deployment or upgrade bundles to perform these checks. Run them separately from the live stage2 runner.
 
@@ -20,8 +20,8 @@ Expected: all boolean columns true. This validates boundary enforcement with con
 
 ## 4. Activated schedule and saved-price selection
 
-`supabase/tests/phase9-activation-rollback.local.sql` uses already-effective synthetic versions inside a rolled-back transaction to exercise reward saved prices, current/future routine selection and materialization on a new empty QA actor. It temporarily remaps only the exact anonymous QA membership. No existing historical snapshot, clock, function or trigger is changed. Expected: every functional check row passed=true. This tests resolver behavior with controlled effective records, not literal midnight passage or the HTTPS gateway. Owner execution is pending.
+`supabase/tests/phase9-activation-rollback.local.sql` uses already-effective synthetic versions inside a rolled-back transaction to exercise reward saved prices, current/future routine selection and materialization on a new empty QA actor. It temporarily remaps only the exact anonymous QA membership. No existing historical snapshot, clock, function or trigger is changed. Expected: every functional check row passed=true. This tests resolver behavior with controlled effective records, not literal midnight passage or the HTTPS gateway. Owner supplied all8 check rows true.
 
 All result tables explicitly enable RLS. If the SQL Editor still warns, use plain Run without its auto-RLS rewrite for these reviewed scripts; keep the final ROLLBACK.
 
-All fixture files are machine-local ignored SQL containing fictional fixture identifiers. Keep them outside commits. Source review is complete; owner execution results remain pending.
+All fixture files are machine-local ignored SQL containing fictional fixture identifiers. Keep them outside commits. Source review is complete. Owner baseline outbox audit passed all11 booleans, revoked Parent DB authority passed all10, synthetic real-clock sealing fixture passed all14. Activation check passed all8 rows. All results remain scoped to the methods above. These results retain the method limits documented above.
