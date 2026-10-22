@@ -1,3 +1,9 @@
+## Delivery acceptance — 21 October 2026
+
+Owner confirmed receipt of the approved Parent notification after saving today's fictional pain-8 entry in Teen. Development Edge worker, matching Edge/Vault worker secrets and minute schedule are operational for this observed delivery. Earlier deployment/delivery-pending statements below are historical. The missing Edge worker secret was added and the Vault value replaced; the sanitized header check then returned true (pg_net 0.20.4). Previous HTTP calls had failed before reaching the worker with a libcurl bad-argument error. Receipt confirms this delivery path, not all retry/revocation/expiry scenarios or either other family phone.
+
+Phase 7 remains open for explicit date-sharing visibility, remote deletion and remaining journal privacy/export acceptance. Initial journal unlock/persistence and this actual push delivery are accepted by owner report. No new automated tests were run.
+
 # Phase 7 build and privacy review — current revision
 
 Both updated applications built and installed in place on the connected Samsung. Existing app data was preserved. Gradle :app:assembleDebug :parent:assembleDebug succeeded in 9 seconds, 167 tasks (4 executed, 163 up-to-date). Local build log: approved-alert-build.local.log.
