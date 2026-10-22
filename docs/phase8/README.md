@@ -1,6 +1,6 @@
 # Phase 8 — Teen quests, rewards and history
 
-Updated 21 October 2026. Status: local implementation built and independently source-reviewed; development SQL deployment and owner acceptance remain pending. Phase8 is not complete.
+Updated 21 October 2026. Status: local implementation built and independently source-reviewed; development SQL deployment and available Teen-side owner walkthrough are accepted. The full Phase8 exit check remains open for confirmed finalized totals/review outcomes through Parent workflows.
 
 ## Implemented locally
 
@@ -35,4 +35,18 @@ Both prepared APKs were installed successfully in place on the connected Samsung
 4. Reconnect/unlock the Samsung and notify the coordinator for in-place installation of both prepared apps. No other family phone is needed for the first trial.
 5. Follow Owner-Walkthrough.md and report actual results. Parent review/confirmation user interfaces follow in Phase9; do not imply an absent Parent button is already implemented.
 
-Code/build/source readiness and owner acceptance are separate milestones. No production changes or cloud deployment are claimed.
+Code/build/source readiness and owner acceptance are separate milestones. No production changes are claimed. Development deployment was accepted by owner with the expected catalogue row.
+
+## Owner acceptance progress — 21 October 2026
+
+Owner confirmed the forward SQL result: effective_from2026-10-21,28 task variants,29 rewards,6 achievements. Both revised APKs were installed in place.
+
+Passed by owner report:
+
+- Quests and Rewards load for the paired Teen.
+- Online completion becomes awaiting Parent review without premature confirmed XP/Coins.
+- Offline completion survives closing/reopening offline; reconnect/retry becomes awaiting Parent review.
+- Offline reward request survives restart; retry creates one visible request with saved price and no debit.
+- Pending reward cancellation is free, with unchanged balance.
+
+These observations do not establish concurrent server approval behavior or all terminal retry cases. The later owner walkthrough also accepted an achievement confirmation request with no award and Day/Week/Month history navigation without false Bad Day labels. Published-result appeal filing and finalized totals remain unverified. Parent confirmation/editing screens remain Phase9.
