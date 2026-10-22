@@ -24,7 +24,8 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 @Composable
-fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: LocalData, modifier: Modifier = Modifier) {
+fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: LocalData, modifier: Modifier = Modifier,
+ teenContent: (@Composable (Membership, Session, FamilyService, suspend () -> String) -> Unit)? = null) {
  val scope = rememberCoroutineScope()
  val context = LocalContext.current
  val service = remember(config) { FamilyService(config) }
@@ -38,18 +39,52 @@ fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: Loca
  var selectedFamily by remember { mutableStateOf("") }
  var message by remember { mutableStateOf("") }; var busy by remember { mutableStateOf(false) }
  var issuedCode by remember { mutableStateOf("") }
+ var membershipStale by remember { mutableStateOf(false) }
  suspend fun save(auth: AuthSession) { val next=Session(auth.userId,config.url,auth.accessToken,auth.refreshToken,auth.expiresAtEpochSeconds); withContext(Dispatchers.IO) { localData.activate(next) }; session=next }
  fun action(block: suspend () -> Unit) { if(busy) return; busy=true; issuedCode=""; scope.launch { message=""; try { block() } catch(e: CancellationException) { throw e } catch(e: Exception) { message=e.message ?: "Request failed. No change confirmed." } finally { busy=false } } }
  suspend fun token(): String {
   val current = session ?: error("Sign in first")
-  if(current.expiresAtEpochSeconds <= System.currentTimeMillis()/1000+60) { save(service.refresh(current.refreshToken)) }
+  if(current.expiresAtEpochSeconds <= System.currentTimeMillis()/1000+60) {
+   val auth=service.refresh(current.refreshToken)
+   val replacement=Session(auth.userId,config.url,auth.accessToken,auth.refreshToken,auth.expiresAtEpochSeconds)
+   check(withContext(Dispatchers.IO) { localData.sessionStore().refreshIfCurrent(current,replacement) }) { "Session changed. Refresh family access." }
+   session=withContext(Dispatchers.IO) { localData.sessionStore().read() }
+  }
   return session!!.token
  }
- suspend fun reload() { memberships=service.memberships(token(),session!!.userId).filter { it.userId == session!!.userId && it.active }; if(selectedFamily !in memberships.map { it.familyId }) selectedFamily=memberships.firstOrNull()?.familyId.orEmpty() }
+ suspend fun reload() {
+  val verified=service.memberships(token(),session!!.userId).filter { it.userId == session!!.userId && it.active }
+  val current=session!!
+  withContext(Dispatchers.IO) {
+   val rows=org.json.JSONArray()
+   verified.forEach { row -> rows.put(JSONObject().put("family_id",row.familyId).put("user_id",row.userId).put("role",row.role).put("actor_id",row.actorId).put("active",row.active).put("family_name",row.familyName)) }
+   localData.family(current.userId,current.endpointId).cacheRemoteSnapshot(com.petalquest.core.data.FamilyRepository.CacheKind.FAMILY,"verified-memberships",JSONObject().put("memberships",rows).toString())
+  }
+  memberships=verified
+  membershipStale=false
+  if(selectedFamily !in memberships.map { it.familyId }) selectedFamily=memberships.firstOrNull()?.familyId.orEmpty()
+ }
  LaunchedEffect(localData) {
-  try { session = withContext(Dispatchers.IO) { localData.sessionStore().read()?.takeIf { it.endpointId == config.url } } }
+  try {
+   session = withContext(Dispatchers.IO) { localData.sessionStore().read()?.takeIf { it.endpointId == config.url } }
+   session?.let { current ->
+    memberships=withContext(Dispatchers.IO) {
+     val cached=localData.family(current.userId,current.endpointId).cached(com.petalquest.core.data.FamilyRepository.CacheKind.FAMILY,"verified-memberships")
+     val rows=cached?.let { JSONObject(it.canonicalPayload).optJSONArray("memberships") }
+     if(rows==null) emptyList() else (0 until rows.length()).map { rows.getJSONObject(it) }.filter { it.optString("user_id")==current.userId && it.optBoolean("active") }.map { Membership(it.getString("family_id"),it.getString("user_id"),it.getString("role"),it.getString("actor_id"),true,it.getString("family_name")) }
+    }
+    selectedFamily=memberships.firstOrNull()?.familyId.orEmpty()
+    membershipStale=memberships.isNotEmpty()
+   }
+  }
   catch(e: CancellationException) { throw e } catch(e: Exception) { requiresReset=true; message="Stored session could not be opened. Reset local family access to sign in again." }
   finally { sessionLoaded=true }
+ }
+ LaunchedEffect(sessionLoaded) {
+  if(sessionLoaded && session != null && config.available && !requiresReset) {
+   live=true
+   action { reload() }
+  }
  }
  Column(modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
   Text(if(isParent) "Petal Quest · Parent" else "Petal Quest · Teen",style=MaterialTheme.typography.headlineSmall)
@@ -73,6 +108,7 @@ fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: Loca
    }
   } else {
    Text("Signed in")
+   if(membershipStale) Text("Saved family access · current permissions will be checked by the service when requests are sent.")
    Button(enabled=!busy,onClick={action { reload() }}) {Text("Refresh family access")}
    memberships.forEach { membership ->
     OutlinedButton(enabled=!busy,onClick={selectedFamily=membership.familyId}) {Text((if(selectedFamily==membership.familyId) "✓ " else "") + membership.familyName + " · " + membership.role)}
@@ -92,6 +128,11 @@ fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: Loca
    } else if(memberships.isEmpty()) {
     OutlinedTextField(code,{code=it},label={Text("Parent's pairing code")})
     Button(enabled=!busy && code.isNotBlank(),onClick={action {val result=service.rpc("redeem_teen_pairing",token(),JSONObject().put("p_code",code.trim()));reload();check(memberships.any { it.familyId==result.getString("family_id") && it.role=="teen" }) { "Membership could not be verified. Refresh family access." };code="";message="Connected."}}) {Text("Connect to family")}
+   }
+   if(!isParent && live && session != null) {
+    memberships.firstOrNull { it.familyId==selectedFamily && it.role=="teen" }?.let { member ->
+     key(member.familyId,session!!.userId,session!!.generation,config.url) { teenContent?.invoke(member,session!!,service,{ token() }) }
+    }
    }
    OutlinedButton(enabled=!busy,onClick={action { withContext(Dispatchers.IO) { localData.logout() }; session=null;memberships=emptyList();selectedFamily="";code="";password="";message="Signed out. Local family session cleared." }}) {Text("Sign out and clear local session")}
   }

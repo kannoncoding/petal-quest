@@ -67,7 +67,8 @@ class MainActivity : ComponentActivity() {
                         Column(modifier = Modifier.padding(innerPadding)) {
                             OutlinedButton(onClick = { startActivity(android.content.Intent(this@MainActivity, com.example.petalquest.health.PrivateCycleActivity::class.java)) }) { Text("Private cycle log") }
                             if (BuildConfig.DEBUG) OutlinedButton(onClick = { showFamily = false }) { Text("Back to development previews") }
-                            com.petalquest.core.ui.FamilyAccessScreen(false, com.petalquest.core.model.ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE), localData)
+                            com.petalquest.core.ui.FamilyAccessScreen(false, com.petalquest.core.model.ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE), localData,
+                                teenContent = { member, session, service, token -> TeenQuestScreen(member, session, service, token, localData) })
                         }
                     } else if (BuildConfig.DEBUG) {
                         var showAssets by remember { mutableStateOf(false) }

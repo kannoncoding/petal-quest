@@ -46,3 +46,14 @@ Use both icon and readable label; do not rely on color alone. These are daily sc
 ## Phase placement
 
 Phase8 implements Teen tasks, submission/review status, confirmed balances, rewards and history consumption. Include authoritative deduction facts and protected-score day summaries in shared service contracts now. Phase9 implements Parent task/rule editors, deduction entry and Parent history UI. Phase10 completes contextual reminders and broader synchronization/notification behavior. Do not claim these new screens or deductions are already deployed.
+
+## P8-004 through P8-007 — follow-up decisions
+
+Confirmed 21 October 2026:
+
+- P8-004: Activate revised tasks today in Costa Rica while preserving existing submitted/finalized records and historical snapshots.
+- P8-005: Teen may submit late work, upload offline completions and resubmit returned work until the original day's effective seal. Parent decides credit. On-time work retains original-day eligibility despite delayed parent review. Null due times do not imply an invented deadline or prevent this approved submission flow.
+- P8-006: Show tracker-based cash/achievement/privilege recommendations; Teen may request the outcome; Parent confirms it. A request grants nothing by itself. These actions record family outcomes and do not control unrelated apps. Consistency achievements require explicit parent confirmation, not an invented automatic streak interpretation.
+- P8-007: On parent finalization, unsubmitted tasks count as zero; submitted reviews must first be resolved (approved, returned, rejected or excused). Finalization must support below-100 days, preserving existing actual-score earnings and protected-score icons.
+
+Existing negative-balance correction/debt handling remains unresolved. Server rejection must explain that limit rather than silently clamping coins or inventing debt. Historical import from the tracker has not been requested; the feature migration does not copy the child's old personal journal or workbook completion records.

@@ -1,0 +1,725 @@
+{
+  "sourceSpreadsheetId": "1GpYowblGnc-3ZOzwLs7HUgdnNQ67vT9ShnfrLAcmQ9Q",
+  "readDate": "2026-10-21",
+  "note": "Read-only catalogue/policy snapshot. Owner overrides take precedence. Achievement counters and personal notes/history excluded.",
+  "rules": [
+    {
+      "sheet": "⚙️ Task Lists",
+      "range": "'⚙️ Task Lists'!A1:H20",
+      "values": [
+        [
+          "Weekday Task",
+          "Weekday XP",
+          null,
+          "Weekend Task",
+          "Weekend XP"
+        ],
+        [
+          "⚠️ 1st Attitude Check",
+          "15",
+          null,
+          "⚠️ 1st Attitude Check",
+          "15"
+        ],
+        [
+          "🎒 BagPack + Lunchbag + Shower + Room @4PM",
+          "11",
+          null,
+          "➡️ Room + Laundry @11PM",
+          "12"
+        ],
+        [
+          "📚 Homework/Study @5:30PM",
+          "12",
+          null,
+          "🚿 Shower +No Mess @1PM",
+          "11"
+        ],
+        [
+          "⚠️ 2nd Attitude Check",
+          "15",
+          null,
+          "📚 Check HS + Other Pendings / Study @2PM",
+          "11"
+        ],
+        [
+          "➡️ Next Day Prepare @6PM",
+          "11",
+          null,
+          "⚠️ 2nd Attitude Check @5PM",
+          "15"
+        ],
+        [
+          "✨ House Help",
+          "11",
+          null,
+          "✨ House Help",
+          "11"
+        ],
+        [
+          "📖 Read a new book -or- Bible",
+          "1",
+          null,
+          "📖 Read a new book -or- Bible",
+          "1"
+        ],
+        [
+          "💧 Drink 3 glasses of water (House)",
+          "1",
+          null,
+          "💧 Drink 3 glasses of water (House)",
+          "1"
+        ],
+        [
+          "📝 Research & write by hand",
+          "1",
+          null,
+          "📝 Research & write by hand",
+          "2"
+        ],
+        [
+          "🎨 Draw / Create Dance",
+          "1",
+          null,
+          "🎨 Draw / Create Dance",
+          "1"
+        ],
+        [
+          "🧹 Clean up Closet / Shoes",
+          "2",
+          null,
+          "🧹 Clean up Closet / Shoes",
+          "2"
+        ],
+        [
+          "🎁 Declutter/give away items",
+          "2",
+          null,
+          "🎁 Declutter/give away items",
+          "2"
+        ],
+        [
+          "📚 Hikari Shop",
+          "2",
+          null,
+          "📚 Hikari Shop",
+          "2"
+        ],
+        [
+          "🙂 Final Attitude Check",
+          "15",
+          null,
+          "🙂 Final Attitude Check",
+          "15"
+        ]
+      ]
+    },
+    {
+      "sheet": "🎁 List_of_Rewards",
+      "range": "'🎁 List_of_Rewards'!A1:F35",
+      "values": [
+        [
+          "#",
+          "Reward",
+          "Coins",
+          "Status",
+          "Type",
+          "Tier"
+        ],
+        [
+          "1",
+          "🎬 Choose a movie/TV Show for family movie night",
+          "450",
+          "Available",
+          "In-House Event",
+          "1 ~ $10"
+        ],
+        [
+          "2",
+          "🃏 Pokémon Booster Pack (~$8)",
+          "600",
+          "Available",
+          "Purchase -Game",
+          "1 ~ $10"
+        ],
+        [
+          "3",
+          "💍 Small accessory: earrings, bracelet, hair clips, phone charm, etc.",
+          "650",
+          "Available",
+          "Purchase -Accessory",
+          "1 ~ $10"
+        ],
+        [
+          "4",
+          "🧋 Boba, smoothie, café or dessert outing with parent",
+          "675",
+          "Available",
+          "Outdoors Food",
+          "1 ~ $10"
+        ],
+        [
+          "5",
+          "🧴 Small self-care/skincare item ($10 max)",
+          "800",
+          "Available",
+          "Purchase -Beauty",
+          "1 ~ $10"
+        ],
+        [
+          "6",
+          "🍕 Pizza/takeout family night",
+          "1200",
+          "Available",
+          "In-House Event Food",
+          "2 ~ $20"
+        ],
+        [
+          "7",
+          "📚 Book, novel, comic or manga under $20",
+          "1200",
+          "Available",
+          "Purchase -Book",
+          "2 ~ $20"
+        ],
+        [
+          "8",
+          "☕ Special parent-daughter outing",
+          "1200",
+          "Available",
+          "Outdoors Food",
+          "2 ~ $20"
+        ],
+        [
+          "9",
+          "🎲 Afternoon at the Arcade",
+          "1350",
+          "Available",
+          "In-House Event",
+          "2 ~ $20"
+        ],
+        [
+          "10",
+          "💄 Skincare/beauty mini-haul ($20 max)",
+          "1400",
+          "Available",
+          "Purchase -Beauty",
+          "2 ~ $20"
+        ],
+        [
+          "11",
+          "📖 New book or manga ($30 max)",
+          "1850",
+          "Available",
+          "Purchase -Book",
+          "3 ~ $30"
+        ],
+        [
+          "12",
+          "👯 Friend comes over + favorite takeout/snacks",
+          "1900",
+          "Available",
+          "In-House Event Food",
+          "3 ~ $30"
+        ],
+        [
+          "13",
+          "🎥 Go to the movies",
+          "1950",
+          "Available",
+          "Outdoors Event",
+          "3 ~ $30"
+        ],
+        [
+          "14",
+          "👕 Branded T-shirt / band / K-pop / anime shirt or accessory",
+          "2000",
+          "Available",
+          "Purchase -Clothing",
+          "3 ~ $30"
+        ],
+        [
+          "15",
+          "🧸 Pokémon/anime/K-pop collectible or plush ($30 max)",
+          "2050",
+          "Available",
+          "Purchase -Collectible",
+          "3 ~ $30"
+        ],
+        [
+          "16",
+          "👯 Bring a friend to movies / café / eat out",
+          "2500",
+          "Available",
+          "Outdoors Event",
+          "4 ~ $40"
+        ],
+        [
+          "17",
+          "🎲 New family board game ($40 max)",
+          "2500",
+          "Available",
+          "Purchase -Game",
+          "4 ~ $40"
+        ],
+        [
+          "18",
+          "🏃 Sports/running/fitness gear upgrade",
+          "2550",
+          "Available",
+          "Purchase -Sports",
+          "4 ~ $40"
+        ],
+        [
+          "19",
+          "🪞 Room décor / vanity / aesthetic bedroom upgrade ($40)",
+          "2650",
+          "Available",
+          "Purchase -Room Decor",
+          "4 ~ $40"
+        ],
+        [
+          "20",
+          "🎒 School-style upgrade: backpack, tote, bottle, pencil case, etc.",
+          "5000",
+          "Available",
+          "Purchase -Tools",
+          "5 ~ $75"
+        ],
+        [
+          "21",
+          "👟 Shoes/sneakers ($70)",
+          "5500",
+          "Available",
+          "Purchase -Clothing",
+          "5 ~ $75"
+        ],
+        [
+          "22",
+          "🎓 Enroll in a short course/workshop she chooses",
+          "6000",
+          "Available",
+          "Purchase -Class",
+          "5 ~ $75"
+        ],
+        [
+          "23",
+          "🃏 Pokémon ETB",
+          "6000",
+          "Available",
+          "Purchase -Game",
+          "5 ~ $75"
+        ],
+        [
+          "24",
+          "💄 Premium skincare/beauty/fashion item ($60–75 max)",
+          "6000",
+          "Available",
+          "Purchase -Beauty",
+          "5 ~ $75"
+        ],
+        [
+          "25",
+          "🎒 Premium backpack + full school/style kit",
+          "10000",
+          "Available",
+          "Purchase -Tools",
+          "Premium ~ $100"
+        ],
+        [
+          "26",
+          "🎫 Contribution toward a concert/show/event she really wants",
+          "10000",
+          "Available",
+          "Purchase -Event",
+          "Premium ~ $100"
+        ],
+        [
+          "27",
+          "🚗 Family day trip / nearby destination",
+          "11000",
+          "Available",
+          "Outdoors Event",
+          "Premium ~ $100"
+        ],
+        [
+          "28",
+          "🛍️ $100 shopping/gift-card budget for K-pop, fashion, beauty, etc.",
+          "12500",
+          "Available",
+          "Purchase",
+          "Premium ~ $100"
+        ],
+        [
+          "29",
+          "🎢 Theme park / major special-event day",
+          "16000",
+          "Available",
+          "Outdoors Event",
+          "Platinum ~ $150+"
+        ]
+      ]
+    },
+    {
+      "sheet": "🏆 Achievements",
+      "range": "'🏆 Achievements'!A1:J24",
+      "values": [
+        [],
+        [
+          "Action",
+          "XP/Coins Awarded",
+          "Notes"
+        ],
+        [
+          "Aced Test",
+          "50",
+          "Any test scored 100"
+        ],
+        [
+          "Student of Excellence I",
+          "250",
+          "All trimester grades > 97"
+        ],
+        [
+          "Student of Excellence II",
+          "300",
+          "Best student of the Class"
+        ],
+        [
+          "Student of Excellence III",
+          "400",
+          "Best student of the Gen"
+        ],
+        [
+          "Girl Machine",
+          "1000",
+          "1 month good behavior consistency"
+        ],
+        [
+          "Wise Princess",
+          "2000",
+          "2 month FULL required consistency"
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+          "Total Achievements XP",
+          "0"
+        ]
+      ]
+    },
+    {
+      "sheet": "⚖️ Accountability & Privileges",
+      "range": "'⚖️ Accountability & Privileges'!A1:H48",
+      "values": [
+        [
+          "⚖️ ACCOUNTABILITY & PRIVILEGES",
+          null,
+          null,
+          null,
+          null,
+          null,
+          "🎁 BENEFITS & PRIVILEGES"
+        ],
+        [
+          "Your final daily XP determines the type of day. 90 is the minimum passing score; scores above 90 move into higher-performance levels.",
+          null,
+          null,
+          null,
+          null,
+          null,
+          "Use this list as the master catalog of benefits and privileges that can be kept, lost, or earned depending on the daily result."
+        ],
+        [],
+        [
+          "Score",
+          "Day Type",
+          "Level",
+          "Meaning",
+          null,
+          null,
+          "#",
+          "Benefit / Privilege"
+        ],
+        [
+          "100",
+          "🌟 Exceptional Day",
+          "Above Pass",
+          "Maximum daily score",
+          null,
+          null,
+          "1",
+          "Agregar 15mins a WhatsApp"
+        ],
+        [
+          "96–99",
+          "💎 Amazing Day",
+          "Above Pass",
+          "Outstanding day",
+          null,
+          null,
+          "2",
+          "Habilitar Cámara y Galería"
+        ],
+        [
+          "91–95",
+          "🏆 Excellent Day",
+          "Above Pass",
+          "Exceeded the passing standard",
+          null,
+          null,
+          "3",
+          "30mins de Televisión"
+        ],
+        [
+          "90",
+          "✅ Passed Day — Good Day",
+          "Pass",
+          "Minimum passing score met",
+          null,
+          null,
+          "4",
+          "Habilitar Walkman"
+        ],
+        [
+          "85–89",
+          "⚠️ Almost Passed",
+          "Below Pass",
+          "Close to the standard, but the day does not pass (still gets the XP)",
+          null,
+          null,
+          "5",
+          "Habilitar Chess App"
+        ],
+        [
+          "75–84",
+          "🟠 Needs Improvement",
+          "Below Pass",
+          "Daily standard was not met",
+          null,
+          null,
+          "6",
+          "Habilitar Pokémon TCG App"
+        ],
+        [
+          "60–74",
+          "🔴 Poor Day",
+          "Below Pass",
+          "Significant improvement is needed",
+          null,
+          null,
+          "7",
+          "Habilitar Emulador GBA"
+        ],
+        [
+          "0–59",
+          "⛔ Bad Day",
+          "Below Pass",
+          "Major expectations were not met",
+          null,
+          null,
+          "8",
+          "Habilitar Google Search"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "9",
+          "Habilitar YouTube Music"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "10",
+          "Habilitar YouTube"
+        ],
+        [
+          "🎯 RESULTS BY DAY TYPE",
+          null,
+          null,
+          null,
+          null,
+          null,
+          "11"
+        ],
+        [
+          "Use this section to define exactly what privileges are kept, what is lost, and what extra benefits or rewards are earned at each level.",
+          null,
+          null,
+          null,
+          null,
+          null,
+          "12"
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "13"
+        ],
+        [
+          "Score",
+          "Day Type",
+          "Result",
+          null,
+          null,
+          null,
+          "14"
+        ],
+        [
+          "100",
+          "🌟 Exceptional Day",
+          "⬇️ + Double XP boost",
+          null,
+          null,
+          null,
+          "15"
+        ],
+        [
+          "96–99",
+          "💎 Amazing Day",
+          "⬇️ + ₡500 for each XP point above 95"
+        ],
+        [
+          "91–95",
+          "🏆 Excellent Day",
+          "⬇️ + Skin Care regained"
+        ],
+        [
+          "90",
+          "✅ Passed Day — Good Day",
+          "⬇️ + add one lost benefit / privilege"
+        ],
+        [
+          "85–89",
+          "⚠️ Almost Passed",
+          "Keep your current benefits and privileges."
+        ],
+        [
+          "75–84",
+          "🟠 Needs Improvement",
+          "Lose 1-2 benefits or privileges"
+        ],
+        [
+          "60–74",
+          "🔴 Poor Day",
+          "Lose 3-4 benefits or privileges"
+        ],
+        [
+          "0–59",
+          "⛔ Bad Day",
+          "Lose all benefits and privileges - Lose Hikari Money - Week plans canceled"
+        ],
+        [],
+        [],
+        [
+          "⚠️ ACCOUNTABILITY DEDUCTIONS"
+        ],
+        [
+          "These deductions reduce the final XP for the day. Multiple deductions may be added together when more than one accountability issue happens on the same day."
+        ],
+        [],
+        [
+          "Accountability Deduction",
+          null,
+          "XP Deduction",
+          "Notes / Examples"
+        ],
+        [
+          "🥪 Dirty Lunchbag",
+          null,
+          "-5 XP"
+        ],
+        [
+          "👕 Torn Clothes",
+          null,
+          "-20 XP"
+        ],
+        [
+          "🚫 Did Not Follow Instructions",
+          null,
+          "-6 XP"
+        ],
+        [
+          "🚿 Forgot Towel or Clothes for Shower",
+          null,
+          "-4 XP"
+        ],
+        [
+          "✨ Messy / Dirty Items",
+          null,
+          "-5 XP"
+        ]
+      ]
+    },
+    {
+      "sheet": "🪙 XP & Coins",
+      "range": "'🪙 XP & Coins'!I1:V5",
+      "values": [
+        [
+          "base",
+          null,
+          "silver",
+          null,
+          "gold",
+          null,
+          "ruby",
+          null,
+          "sapphire",
+          null,
+          "emerald",
+          null,
+          "diamond"
+        ]
+      ]
+    }
+  ]
+}

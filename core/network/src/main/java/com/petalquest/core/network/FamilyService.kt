@@ -59,6 +59,7 @@ class FamilyService(private val config: ServiceConfig) {
  suspend fun rpc(name: String, token: String, args: JSONObject): JSONObject {
   requireContract(token)
   require(name in setOf("create_family","issue_parent_invite","issue_teen_pairing","accept_parent_invite","redeem_teen_pairing","create_occurrence","reconcile_occurrences","submit_occurrence","approve_submission","revoke_membership","issue_teen_replacement","register_device",
+   "get_teen_dashboard", "materialize_teen_tasks", "request_reward", "cancel_reward_request", "request_extra_outcome", "request_day_appeal",
    "register_health_installation", "list_health_installations", "request_wipe", "list_pending_wipes", "claim_wipe", "acknowledge_wipe",
    "upsert_period_range", "delete_period_range", "list_period_ranges", "submit_high_pain_checkin", "list_parent_checkins", "get_checkin_policy"))
   val result = JSONObject(request("/rest/v1/rpc/" + name,token,args))
