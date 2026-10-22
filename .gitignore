@@ -60,6 +60,7 @@ exports/private/
 # Phase 6 local-only configuration
 *.local.json
 *.local.log
+*.local.sql
 **/node_modules/
 
 # Local live verification fixtures, reports and generated owner audit

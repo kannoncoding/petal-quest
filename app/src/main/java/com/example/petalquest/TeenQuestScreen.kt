@@ -9,6 +9,7 @@ import com.petalquest.core.data.*
 import com.petalquest.core.model.Membership
 import com.petalquest.core.network.FamilyService
 import com.petalquest.core.ui.QueuedSubmissions
+import com.petalquest.core.ui.FamilyForegroundRefresh
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -41,6 +42,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
  var busy by remember { mutableStateOf(false) }
  var message by remember { mutableStateOf("") }
  var stale by remember { mutableStateOf(false) }
+ var resumeRefreshPending by remember { mutableStateOf(false) }
  var page by remember { mutableStateOf("Quests") }
  var range by remember { mutableStateOf("Week") }
  var anchor by remember { mutableStateOf(dateText(Calendar.getInstance(familyZone))) }
@@ -58,6 +60,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
   return from to dateText(cal)
  }
  suspend fun load() {
+  stale=true
   val (from,to)=bounds()
   val remote=service.rpc("get_teen_dashboard",token(),JSONObject().put("p_from",from).put("p_to",to))
   check(remote.value("family_id")==member.familyId && remote.value("teen_id")==member.actorId) { "Family access changed. Reconnect to your family." }
@@ -74,7 +77,11 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
   snapshot=remote;stale=false
   withContext(Dispatchers.IO) { repository.cacheRemoteSnapshot(FamilyRepository.CacheKind.QUESTS,member.familyId+":"+from+":"+to,remote.toString()); pending=repository.pending() }
  }
- fun action(block:suspend () -> Unit) { if(!busy) { busy=true;scope.launch { try { message="";block() } catch(e:CancellationException) { throw e } catch(e:Exception) { message=e.message ?: "No change confirmed. Retry when connected." } finally { try { pending=withContext(Dispatchers.IO) { repository.pending() } } catch(e:CancellationException) { throw e } catch(_:Exception) { pending=emptyList();snapshot=null };busy=false } } } }
+ fun action(block:suspend () -> Unit) { if(!busy) { busy=true;scope.launch { try { message="";block() } catch(e:CancellationException) { throw e } catch(e:Exception) { stale=true;message=e.message ?: "No change confirmed. Retry when connected." } finally { try { pending=withContext(Dispatchers.IO) { repository.pending() } } catch(e:CancellationException) { throw e } catch(_:Exception) { pending=emptyList();snapshot=null };busy=false } } } }
+ FamilyForegroundRefresh(onBackground={stale=true},onReturn={stale=true;resumeRefreshPending=true})
+ LaunchedEffect(resumeRefreshPending,busy) {
+  if(resumeRefreshPending && !busy) { resumeRefreshPending=false;action { load() } }
+ }
  suspend fun dispatch(op:PendingOperation) {
   if(op.kind==FamilyRepository.OperationKind.QUEST_SUBMIT.name) { submissions.retry(op,token());return }
   val payload=JSONObject(op.canonicalPayload)
@@ -117,7 +124,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
   Text("Costa Rica time · weeks start Sunday")
   Row { listOf("Quests","Rewards","History").forEach { tab -> TextButton(enabled=!busy,onClick={page=tab;if(tab=="Quests") { range="Week";anchor=dateText(Calendar.getInstance(familyZone)) }}) { Text(if(tab==page) "• $tab" else tab) } } }
   if(busy) LinearProgressIndicator(Modifier.fillMaxWidth())
-  if(stale) Text("Saved server snapshot · refresh to check current status")
+  if(stale || resumeRefreshPending) Text("Saved server snapshot · refresh to check current status")
   OutlinedButton(enabled=!busy,onClick={action { load() }}) { Text("Refresh confirmed results") }
   if(message.isNotBlank()) Text(message)
   ConfirmedMascot(celebration)
@@ -126,6 +133,13 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
    Text("Coin rank: ${balance.value("coin_rank",snapshot!!.value("coin_rank","Awaiting confirmed rank"))}")
    Text("Requests are free. Coins are charged once when a parent approves. Spending can change your coin rank; earned XP history stays.")
    if(balance.optLong("available_coins")<0) Text("Your coin balance has debt from a corrected result. New earnings repay it. Reward approvals pause until the debt is repaid.")
+  }
+  if(page=="Quests" || page=="History") {
+   Text("Assigned routines",style=MaterialTheme.typography.titleMedium)
+   Text("Costa Rica local time · routines give no points and need no approval")
+   val routines=snapshot?.rows("assigned_routines").orEmpty()
+   if(routines.isEmpty()) Text("No assigned routines in this date range.")
+   routines.forEach { row -> Text("${row.value("local_date")} · ${row.value("title")} · ${row.optJSONArray("local_times")?.join(", ") ?: ""}") }
   }
   if(pending.isNotEmpty()) {
    Text("Pending send · ${pending.size}",style=MaterialTheme.typography.titleMedium)
@@ -151,6 +165,16 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
     Row { Text("Weekly view");Switch(weekly,{weekly=it},enabled=!busy) }
     Text(if(weekly) "Tasks this Sunday–Saturday" else "Tasks today",style=MaterialTheme.typography.titleLarge)
     val today=if(!stale) data.value("server_local_date",dateText(Calendar.getInstance(familyZone))) else dateText(Calendar.getInstance(familyZone))
+    data.rows("day_summaries").firstOrNull { it.value("local_date")==today && it.value("status") in listOf("finalized","sealed") }?.let { result ->
+     Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(6.dp)) {
+      Text("Today's result · ${result.value("status")}",style=MaterialTheme.typography.titleMedium)
+      Text("${result.value("performance_icon","")} ${result.value("performance_label","")}")
+      Text("Actual ${result.value("actual_score")} · protected ${result.value("protected_score")}")
+      Text("Earned ${result.value("earned_xp")} XP · ${result.value("coins_earned")} coins")
+      if(result.optInt("actual_score")<85) Text("Below 85 actual points earns zero XP and coins.")
+      TextButton(enabled=!busy,onClick={page="History";range="Day";anchor=today;selectedDay=today}) { Text("View today's result") }
+     } }
+    }
     val tasks=data.rows("tasks").filter { weekly || it.value("local_date")==today }
     if(tasks.isEmpty()) Text("No task occurrences in this view. Refresh to check availability.")
     tasks.forEach { task ->

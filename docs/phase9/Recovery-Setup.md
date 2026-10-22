@@ -1,6 +1,11 @@
 # Parent password recovery setup — development only
 
-Prepared, not applied or live-verified. No recovery emails have been sent by the coordinator.
+DEFERRED by owner on 22 October 2026 for private family use. Parent recovery UI is hidden; this optional future setup is not a Phase9 completion requirement. Owner-managed Supabase account administration is the chosen approach. No recovery emails have been sent by the coordinator.
+## Prerequisite: custom SMTP
+
+The development dashboard requires custom SMTP before editing email templates (owner screenshot confirmed 22 October 2026). Select Set up SMTP to open configuration. This requires an email-sending provider's SMTP host, port, username/password and sender details; the button does not create a provider account or credentials. Provider selection and configuration are pending owner input. Keep credentials in provider/Supabase settings, never in chat or this repository.
+
+After SMTP is configured, follow the template steps below. The prepared Parent app expects a recovery code using {{ .Token }}; its recovery screen does not handle the default email's reset link. Recovery remains pending while other Phase 9 walkthroughs can proceed. See [Supabase custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp).
 
 1. Open Petal Quest Dev (hijtwgugzzpjjkuutyfy), Authentication → Email templates (sometimes under Notifications → Emails).
 2. Open Reset password / Password recovery. Preserve the existing template outside the repository if you want a local rollback copy.

@@ -38,7 +38,7 @@ class FamilyService(private val config: ServiceConfig) {
     val code=try { JSONObject(detail).optString("message") } catch(e: Exception) { "" }
     val known=when(code) {
      "negative_correction_debt_policy_required" -> "This correction could not be completed. Refresh the current balance and try again."
-     "stale_note_refresh_required", "stale_day_revision_refresh_required", "stale_review_refresh_required", "stale_catalogue_refresh_required", "stale_revision_refresh_required", "version_conflict", "outcome_already_resolved" -> "Another decision changed this item. Refresh and review its latest state."
+     "stale_routine_refresh_required", "stale_note_refresh_required", "stale_day_revision_refresh_required", "stale_review_refresh_required", "stale_catalogue_refresh_required", "stale_revision_refresh_required", "version_conflict", "outcome_already_resolved" -> "Another decision changed this item. Refresh and review its latest state."
      "day_sealed", "result_sealed", "sealed_day", "appeal_expired", "day_seal_reached" -> "This day has sealed. Its result can no longer change."
      "insufficient_coins", "insufficient_balance" -> "There are not enough available coins for this approval."
      "invalid_history_range" -> "Enter a valid history date."
@@ -84,7 +84,7 @@ class FamilyService(private val config: ServiceConfig) {
  suspend fun rpc(name: String, token: String, args: JSONObject): JSONObject {
   requireContract(token)
   require(name in setOf("create_family","issue_parent_invite","issue_teen_pairing","accept_parent_invite","redeem_teen_pairing","create_occurrence","reconcile_occurrences","submit_occurrence","approve_submission","revoke_membership","issue_teen_replacement","register_device",
-   "correct_occurrence", "offer_bonus", "submit_bonus", "review_bonus", "reverse_deduction", "save_reflection_note", "save_task_catalogue", "confirm_cash_outcome", "review_submission_checked", "get_parent_dashboard", "review_submission", "finalize_complete_day", "enter_deduction", "review_extra_outcome", "review_reward_request", "approve_reward_request", "save_catalogue_version", "resolve_day_appeal", "get_teen_dashboard", "materialize_teen_tasks", "request_reward", "cancel_reward_request", "request_extra_outcome", "request_day_appeal",
+   "save_assigned_routine", "correct_occurrence", "offer_bonus", "submit_bonus", "review_bonus", "reverse_deduction", "save_reflection_note", "save_task_catalogue", "confirm_cash_outcome", "review_submission_checked", "get_parent_dashboard", "review_submission", "finalize_complete_day", "enter_deduction", "review_extra_outcome", "review_reward_request", "approve_reward_request", "save_catalogue_version", "resolve_day_appeal", "get_teen_dashboard", "materialize_teen_tasks", "request_reward", "cancel_reward_request", "request_extra_outcome", "request_day_appeal",
    "register_health_installation", "list_health_installations", "request_wipe", "list_pending_wipes", "claim_wipe", "acknowledge_wipe",
    "upsert_period_range", "delete_period_range", "list_period_ranges", "submit_high_pain_checkin", "list_parent_checkins", "get_checkin_policy"))
   val result = JSONObject(request("/rest/v1/rpc/" + name,token,args))

@@ -2,6 +2,7 @@ package com.petalquest.parent
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,6 +13,7 @@ import com.petalquest.core.data.*
 import com.petalquest.core.model.Membership
 import com.petalquest.core.network.FamilyService
 import com.petalquest.core.network.FamilyServiceRejected
+import com.petalquest.core.ui.FamilyForegroundRefresh
 import kotlinx.coroutines.*
 import org.json.*
 import java.util.Calendar
@@ -39,7 +41,9 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
  var section by remember { mutableStateOf("Review") }
  var busy by remember { mutableStateOf(false) }
  var stale by remember { mutableStateOf(true) }
+ var resumeRefreshPending by remember { mutableStateOf(false) }
  var message by remember { mutableStateOf("") }
+ var decisionError by remember { mutableStateOf<String?>(null) }
  var note by remember { mutableStateOf("") }
  var cashAmount by remember { mutableStateOf("") }
  var confirmation by remember { mutableStateOf<List<ParentAction>?>(null) }
@@ -47,6 +51,7 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
  LaunchedEffect(session.generation) { receipts.getString("unresolved-actions",null)?.let { saved -> val a=JSONArray(saved);unresolved=(0 until a.length()).map { val row=a.getJSONObject(it);ParentAction(row.getString("title"),row.getString("rpc"),row.getJSONObject("args")) } } }
  val cacheKey="parent:"+member.familyId+":"+teen+":"+date+":"+period
  suspend fun reload() {
+  stale=true
   val selected=ParentDate.parse(date)
   val from=when(period) { "Week" -> selected.minusDays((selected.sundayDay).toLong()); "Month" -> selected.withDayOfMonth(1); else -> selected }
   val to=when(period) { "Week" -> from.plusDays(6); "Month" -> from.plusMonths(1).minusDays(1); else -> from }
@@ -56,6 +61,10 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
   dashboard=result; stale=false
  }
  fun refresh() { if(busy) return; busy=true; scope.launch { try { reload();message="Updated from family service." } catch(e: CancellationException) { throw e } catch(e: Exception) { stale=true;message="Could not refresh. Saved information is read only. Try again when connected." } finally { busy=false } } }
+ FamilyForegroundRefresh(onBackground={stale=true},onReturn={stale=true;resumeRefreshPending=true})
+ LaunchedEffect(resumeRefreshPending,busy) {
+  if(resumeRefreshPending && !busy) { resumeRefreshPending=false;refresh() }
+ }
  LaunchedEffect(cacheKey) {
   stale=true;dashboard=JSONObject();note="";cashAmount="";confirmation=null;busy=true
   try {
@@ -70,16 +79,17 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
  fun outcomeTitle(row: JSONObject): String { val catalogue=dashboard.optJSONObject("outcome_catalogue");val items=(catalogue?.rows("cash").orEmpty()+catalogue?.rows("privileges").orEmpty()+dashboard.rows("achievements"));return row.optJSONObject("catalogue_snapshot")?.words("title","")?.takeIf { it.isNotBlank() } ?: items.firstOrNull { it.words("id")==row.words("outcome_key") }?.words("title", "Family outcome") ?: "Family outcome" }
  Text("Family dashboard",style=MaterialTheme.typography.titleLarge)
  dashboard.optJSONObject("balance")?.let { balance -> Text("${balance.words("earned_xp","0")} earned XP · ${balance.words("available_coins","0")} available coins");if(balance.optLong("available_coins")<0) Text("Coin debt: new earnings repay this balance. Reward approval is blocked until it is repaid.") }
- Text(if(stale) "Saved information · reconnect and refresh before making decisions" else "Current family information · server checks each decision")
+ Text(if(stale || resumeRefreshPending) "Saved information · reconnect and refresh before making decisions" else "Current family information · server checks each decision")
  OutlinedButton(enabled=!busy,onClick={refresh()}) { Text("Refresh dashboard") }
+ if(message.isNotBlank()) Text(message)
  dashboard.rows("actors").filter { it.words("role")=="teen" }.forEachIndexed { index,row ->
   OutlinedButton(enabled=!busy && unresolved.isEmpty(),onClick={teen=row.words("actor_id",row.words("id",""))}) { Text("Teen ${index+1}"+(if(selectedTeen==row.words("actor_id",row.words("id",""))) " · selected" else "")) }
  }
  OutlinedTextField(date,{date=it},label={Text("History date (YYYY-MM-DD)")},singleLine=true,enabled=!busy && unresolved.isEmpty())
  Row { listOf("Day","Week","Month").forEach { label -> TextButton(enabled=!busy && unresolved.isEmpty(),onClick={period=label}) { Text(label) } } }
- Row { listOf("Review","Adjust","History","Edit","Access").forEach { label -> TextButton(onClick={section=label}) { Text(label) } } }
+ Row(Modifier.horizontalScroll(rememberScrollState())) { listOf("Review","Adjust","History","Edit","Access").forEach { label -> TextButton(onClick={section=label}) { Text(label) } } }
  if(unresolved.isNotEmpty()) { Text("An earlier decision needs confirmation from the service. Retry the saved decision before entering another.");OutlinedButton(enabled=!busy && !stale,onClick={confirmation=unresolved}) { Text("Review and retry saved decision") } }
- val enabled=!busy && !stale && selectedTeen.isNotBlank() && unresolved.isEmpty()
+ val enabled=!busy && !stale && !resumeRefreshPending && selectedTeen.isNotBlank() && unresolved.isEmpty()
  if(section=="Review") {
   Text("Submission decisions",style=MaterialTheme.typography.titleMedium)
   Text("Points shown on duties are contributions. Earned XP and coins are confirmed when a day is published.")
@@ -164,7 +174,10 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
   Text("Result appeals",style=MaterialTheme.typography.titleMedium)
   dashboard.rows("day_appeals").forEach { row -> Text("${row.words("local_date")} · ${row.words("status")} · ${row.words("reason")}") }
  }
- if(section=="Edit") ParentCatalogueEditor(dashboard,enabled) { title,rpc,args -> propose(title,rpc,args.put("p_family_id",member.familyId)) }
+ if(section=="Edit") {
+  ParentRoutineEditor(dashboard,selectedTeen,enabled) { title,rpc,args -> propose(title,rpc,args.put("p_family_id",member.familyId)) }
+  ParentCatalogueEditor(dashboard,enabled) { title,rpc,args -> propose(title,rpc,args.put("p_family_id",member.familyId)) }
+ }
  if(section=="Access") {
   Text("Family and device access",style=MaterialTheme.typography.titleMedium)
   dashboard.rows("memberships").forEachIndexed { index,row ->
@@ -176,7 +189,6 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
   OutlinedButton(enabled=enabled,onClick={propose("Replace this teen's device pairing. Existing teen access will be revoked.","issue_teen_replacement",JSONObject().put("p_family_id",member.familyId).put("p_actor_id",selectedTeen))}) { Text("Replace teen device") }
  }
  if(busy) CircularProgressIndicator()
- if(message.isNotBlank()) Text(message)
  confirmation?.let { actions -> AlertDialog(onDismissRequest={if(!busy) confirmation=null},title={Text("Confirm family decision")},text={Column(Modifier.heightIn(max=420.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(8.dp)) { Text("${actions.size} action(s). Decisions are recorded by the service.");actions.forEach { Text(it.title) };Text("Note: ${note.ifBlank { "None" }}") }},confirmButton={TextButton(enabled=!busy,onClick={
   busy=true;scope.launch {
    var completed=0
@@ -194,10 +206,11 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
      if(action.rpc=="issue_teen_replacement") message="Replacement code: "+result.words("code")+" · expires "+result.words("expires_at")
     }
     if(message.startsWith("Replacement code:").not()) message="$completed action(s) confirmed by the service."
-   } catch(e: CancellationException) { throw e } catch(e: Exception) { if(e is FamilyServiceRejected && e.statusCode in 400..499 && e.statusCode!=408 && e.statusCode!=429) { unresolved=emptyList();receipts.edit().remove("unresolved-actions").commit() };message="$completed action(s) confirmed. "+(e.message ?: "No further change confirmed.")+" Refresh before trying again." }
+   } catch(e: CancellationException) { throw e } catch(e: Exception) { if(e is FamilyServiceRejected && e.statusCode in 400..499 && e.statusCode!=408 && e.statusCode!=429) { unresolved=emptyList();receipts.edit().remove("unresolved-actions").commit() };message="$completed action(s) confirmed. "+(e.message ?: "No further change confirmed.")+" Refresh before trying again.";decisionError=message }
    finally { confirmation=null;try { reload() } catch(e: Exception) { stale=true };busy=false }
   }
  }) { Text("Confirm ${actions.size} action(s)") }},dismissButton={TextButton(enabled=!busy,onClick={confirmation=null}) { Text("Keep reviewing") }}) }
+ if(confirmation==null) decisionError?.let { error -> AlertDialog(onDismissRequest={decisionError=null},title={Text("Decision not fully confirmed")},text={Text(error)},confirmButton={TextButton(onClick={decisionError=null}) { Text("OK") }}) }
 }
 
 @Composable
@@ -301,7 +314,7 @@ private fun ParentAdjustments(data: JSONObject,date: String,teen: String,enabled
  OutlinedTextField(reflection,{reflection=it.take(4000)},label={Text("Family reflection note")})
  Button(enabled=enabled,onClick={propose("Save shared reflection note for $date: $reflection","save_reflection_note",JSONObject().put("p_teen_id",teen).put("p_local_date",date).put("p_text",reflection.trim()).put("p_expected_version",savedNote?.optInt("version",0) ?: 0))}) { Text("Review reflection note") }
 }
-private class ParentDate private constructor(private val value: Calendar): Comparable<ParentDate> {
+internal class ParentDate private constructor(private val value: Calendar): Comparable<ParentDate> {
  val sundayDay: Int get()=value.get(Calendar.DAY_OF_WEEK)-1
  fun plusDays(days: Long)=copy().apply { value.add(Calendar.DAY_OF_MONTH,days.toInt()) }
  fun minusDays(days: Long)=plusDays(-days)

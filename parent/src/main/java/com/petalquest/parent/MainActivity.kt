@@ -16,6 +16,6 @@ class MainActivity : ComponentActivity() {
  private val localData by lazy { LocalData.getInstance(this) }
  override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState)
  window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
- setContent { MaterialTheme { Scaffold { inset -> Column(Modifier.padding(inset)) { ParentPushSetup(); FamilyAccessScreen(true, ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE), localData, Modifier.weight(1f), parentContent = { member, session, service, token -> ParentDashboard(member, session, service, localData, token) }, parentRecovery = { PasswordRecoveryPanel(ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE)) }) } } } }
+ setContent { MaterialTheme { Scaffold { inset -> Column(Modifier.padding(inset)) { ParentPushSetup(); FamilyAccessScreen(true, ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE), localData, Modifier.weight(1f), parentContent = { member, session, service, token -> ParentDashboard(member, session, service, localData, token) }) } } } }
  }
 }

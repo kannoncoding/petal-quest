@@ -1,6 +1,6 @@
 # Phase 9 status — 22 October 2026
 
-Status: prepared locally, both APKs built, source-reviewed. Not deployed, installed or physically accepted. Phase9 remains open. The phone was intentionally unavailable; no installation was attempted.
+Status: prepared locally, both APKs built, source-reviewed. Development SQL upgrade confirmed by the owner on 22 October 2026: all five schema flags true. Both updated APKs installed in place on the connected Samsung on 22 October 2026; ADB reported Success for each. Existing app data retained. Functional acceptance is in progress; Phase9 remains open.
 
 ## Prepared implementation
 
@@ -13,27 +13,38 @@ Status: prepared locally, both APKs built, source-reviewed. Not deployed, instal
 - Rewards: saved-price approval, fulfillment, free pending cancellation and once-only approved/unfulfilled refund. Existing29 reward entries can be edited with future versions; creating new reward keys is not implemented.
 - Achievement/cash/privilege request confirmations with immutable award source, saved achievement XP, explicit cash amount/reason and audit. No automatic payments, app permission control or inferred consistency awards.
 - Full duty-set editor: add/archive duties, daily/weekly recurrence, points/deadlines and future effective date. Every weekday must total100; changes commit atomically, preserving historical snapshots and exact expected day sets.
+- Assigned routine schedules: separate versioned Parent editor with titles, local times, Sunday-based recurrence, future effective dates and archive state; Teen reads date-resolved snapshots. No XP, approvals or notification delivery. Migration013 owner-confirmed: routines_ready and rls_enabled true; live schedule checks pending.
 - Shared reflection notes: Parents edit with optimistic versions and history; Teen read-only. Private health remains separate and existing limited Parent health controls are retained.
-- Password recovery: emailed one-time recovery code, transient credentials, authenticated password update and normal sign-in afterward. Requires the prepared development email-template update.
+- Password recovery: deferred by owner for private family use. Prepared code is retained, but the Parent recovery entry point is hidden. No SMTP or recovery email check is required to close Phase9; owner-managed account administration is the chosen approach.
 
 ## Source and build evidence
 
-Developers and independent QA reviewed authorization, explicit RLS, family isolation, source/request identity, stale generations, financial provenance and commit-time sealing. Coordinator additionally reviewed full actual/protected/converted-score arithmetic, debt deltas, legacy materialization gates and recovery lifecycle. No new automated tests or SQL runtime tests were added or run. Read Review.md and Expected-Accounting-Examples.md for the boundaries of this evidence.
+Developers and independent QA reviewed authorization, explicit RLS, family isolation, source/request identity, stale generations, financial provenance and commit-time sealing. Coordinator additionally reviewed full actual/protected/converted-score arithmetic, debt deltas, legacy materialization gates and recovery lifecycle. That initial source review did not execute tests. Subsequently the explicitly authorized live HTTPS baseline runner completed15 PASS with9 outstanding gates; see Backend-Acceptance-Results.md. Read Review.md and Expected-Accounting-Examples.md for the boundaries of this evidence.
 
-Final Gradle :app:assembleDebug :parent:assembleDebug: BUILD SUCCESSFUL in11 seconds;167 tasks (8 executed,159 up-to-date). Local log: Documentation/Phase9/build-debug.local.log.
+Final Gradle :app:assembleDebug :parent:assembleDebug: BUILD SUCCESSFUL in11 seconds;167 tasks (4 executed,163 up-to-date). Local log: Documentation/Phase9/build-debug.local.log.
 
-- Teen APK SHA256 F9D50116EAE2635B60D03497956FAC3C69B308F8CEF1F1A3F0EDDFF485B1CC9C
-- Parent APK SHA256 BF455919B94D85A300294B410B7920C4223E2ED6F15C781C0C322205CEF09F78
+- Teen APK SHA256 F0515358E95C2366702014A58FB7A4279AA3D8ED519E65744C3B9F065B2EB491
+- Parent APK SHA256 4C972B4E6EA53D8FB011457127832AE6D90BA1060F3F81A8F5104AFD778140E8
 
 ## Owner actions before/after reconnecting
 
-1. Without the phone: apply the reviewed forward SQL file in Petal Quest Dev only, as described in Owner-Actions.md. Do not rerun an initial deployment bundle. No new key, Firebase project or production change is required.
-2. Without the phone: configure only the development password-recovery email template using Recovery-Setup.md, if ready to exercise recovery.
-3. Later reconnect/unlock the Samsung for in-place installation of both prepared apps. Keep existing app data; do not uninstall/reset.
+1. Development SQL upgrade completed with the expected five schema flags. Do not rerun the forward upgrade or an initial deployment bundle.
+2. Email recovery and SMTP deferred by owner; no email setup required.
+3. Completed: both apps installed in place on the Samsung. Keep existing app data; do not uninstall/reset.
 4. Use Acceptance-Checklist.md for fictional-data verification. Two independently authenticated Parent sessions are needed for the concurrency gate; two physical family phones are one option, not a requirement for preparing code. The other phones/Android versions remain unverified until available.
 
 ## Remaining limits
 
-Actual deployment, RLS behavior, accounting, concurrent requests, retries and phone interaction remain unverified. The remaining Phase8 finalized-result/review/appeal checks can be exercised through these Parent screens after deployment/install; they are not retroactively marked passed. Recovery needs a receivable owner-controlled development inbox; example.com QA accounts cannot receive mail. Optional Parent quick unlock is not enabled; ordinary authenticated sign-in remains the authority.
+Schema deployment is owner-confirmed. Baseline live API checks passed for authority/isolation, accounting thresholds, approve/approve concurrency and retry identities; other races, boundary and phone checks remain open. SMTP and app-based recovery are owner-deferred, not completion blockers. The remaining Phase8 finalized-result/review/appeal checks can be exercised through these Parent screens after deployment/install; they are not retroactively marked passed. The retained, deferred recovery implementation would need custom SMTP and a receivable development inbox if enabled later. Optional Parent quick unlock is not enabled; ordinary authenticated sign-in remains the authority.
 
 Approved-bonus reversal and reopening cancelled offers are unavailable pending explicit lifecycle rules. Fulfilled reward reversal is unavailable. Parent notes do not alter sealed scores; shared notes are visible to the Teen. Transactional outbox events are prepared, but delivery for these new topics and contextual reminders remain Phase10. No production deployment or personal tracker-history import was performed.
+
+## Current acceptance
+
+- All three development forward upgrades are owner-confirmed: core Phase9, assigned routines013 and review audit repair014. Do not rerun those upgrades for tests.
+- Baseline live HTTPS QA:15 PASS,0 FAIL,9 initially unverified. Second batch:14 PASS,0 FAIL,6 initially unverified (three login checks repeat). Exact coverage and limits are in Backend-Acceptance-Results.md.
+- Owner read-only baseline outbox audit: all11 booleans true, correct source uniqueness/minimal payloads and0 private relations readable by anon/authenticated. This closes that baseline gate; business push delivery remains Phase10.
+- Owner phone return/note/resubmission/approval now matches in both apps. Approval alone leaves XP/coins unchanged. Owner published78 actual points (correctly0 earned), then confirmed all published information displays correctly in both apps while submitting further work. Do not invent an unreported final total.
+- Latest Teen Quests screen includes today's published result card and link to full history; Gradle build passed and APK installed in place. Latest complete hashes are above. Parent error feedback and foreground refresh are installed. No app data was cleared.
+- Pending: owner execution of rollback-only revocation and synthetic sealing fixtures; controlled activation/saved-price fixture; Android restart/failure and remaining staged Parent UI observations. These fixtures use temporary result tables with explicit RLS. Run whole scripts through ROLLBACK; the SQL-editor auto-RLS wrapper is unnecessary.
+- GitHub commit/push explicitly approved by owner. Phase9 remains open until remaining required evidence is recorded.
