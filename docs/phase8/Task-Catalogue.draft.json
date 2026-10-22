@@ -1,0 +1,937 @@
+{
+  "status": "draft catalogue; sourced values plus explicit owner override; identifiers assigned once and retained",
+  "date": "2026-10-21",
+  "timezone": "America/Costa_Rica",
+  "weekStart": "Sunday 00:00",
+  "sourceSnapshot": "Tracker-Rule-Extract.json",
+  "duties": [
+    {
+      "id": "duty-wd-001",
+      "title": "⚠️ 1st Attitude Check",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 2,
+      "sourceXp": 15,
+      "xp": 15,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-we-001",
+      "title": "⚠️ 1st Attitude Check",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 2,
+      "sourceXp": 15,
+      "xp": 15,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-wd-002",
+      "title": "🎒 Lunchbag + Shower + Room @4PM",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 3,
+      "sourceXp": 11,
+      "xp": 11,
+      "decisionRef": "P8-001",
+      "dueTime": "16:00",
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "dueTimeBasis": "explicit time in owner-supplied source duty label",
+      "previousTitle": "🎒 BagPack + Lunchbag + Shower + Room @4PM"
+    },
+    {
+      "id": "duty-we-002",
+      "title": "➡️ Room + Laundry @11AM",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 3,
+      "sourceXp": 12,
+      "xp": 12,
+      "decisionRef": null,
+      "dueTime": "11:00",
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "sourceTitle": "➡️ Room + Laundry @11PM",
+      "dueTimeDecisionRef": "P3-006"
+    },
+    {
+      "id": "duty-wd-003",
+      "title": "📚 Homework/Study + HighSchool Pendings + BagPack preparation + review @5:30PM",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 4,
+      "sourceXp": 12,
+      "xp": 12,
+      "decisionRef": "P8-001",
+      "dueTime": "17:30",
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "dueTimeBasis": "explicit time in owner-supplied source duty label",
+      "previousTitle": "📚 Homework/Study @5:30PM"
+    },
+    {
+      "id": "duty-we-003",
+      "title": "🚿 Shower +No Mess @1PM",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 4,
+      "sourceXp": 11,
+      "xp": 11,
+      "decisionRef": null,
+      "dueTime": "13:00",
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "dueTimeBasis": "explicit time in owner-supplied source duty label"
+    },
+    {
+      "id": "duty-wd-004",
+      "title": "⚠️ 2nd Attitude Check + mouth piece check",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 5,
+      "sourceXp": 15,
+      "xp": 15,
+      "decisionRef": "P8-001",
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "previousTitle": "⚠️ 2nd Attitude Check"
+    },
+    {
+      "id": "duty-we-004",
+      "title": "📚 Check HS + Other Pendings / Study @2PM",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 5,
+      "sourceXp": 11,
+      "xp": 11,
+      "decisionRef": null,
+      "dueTime": "14:00",
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "dueTimeBasis": "explicit time in owner-supplied source duty label"
+    },
+    {
+      "id": "duty-wd-005",
+      "title": "➡️ Next Day Prepare + Room clean up @6PM",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 6,
+      "sourceXp": 11,
+      "xp": 11,
+      "decisionRef": "P8-001",
+      "dueTime": "18:00",
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "dueTimeBasis": "explicit time in owner-supplied source duty label",
+      "previousTitle": "➡️ Next Day Prepare @6PM"
+    },
+    {
+      "id": "duty-we-005",
+      "title": "⚠️ 2nd Attitude Check + mouth piece check @5PM",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 6,
+      "sourceXp": 15,
+      "xp": 15,
+      "decisionRef": "P8-001",
+      "dueTime": "17:00",
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "dueTimeBasis": "explicit time in owner-supplied source duty label",
+      "previousTitle": "⚠️ 2nd Attitude Check @5PM"
+    },
+    {
+      "id": "duty-wd-006",
+      "title": "✨ House Help + meditation/reading",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 7,
+      "sourceXp": 11,
+      "xp": 11,
+      "decisionRef": "P8-001",
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "previousTitle": "✨ House Help"
+    },
+    {
+      "id": "duty-we-006",
+      "title": "✨ House Help + meditation/reading",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 7,
+      "sourceXp": 11,
+      "xp": 11,
+      "decisionRef": "P8-001",
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "previousTitle": "✨ House Help"
+    },
+    {
+      "id": "duty-wd-007",
+      "title": "🌱 Water plants",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 8,
+      "sourceXp": 1,
+      "xp": 1,
+      "decisionRef": "P8-001",
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "previousTitle": "📖 Read a new book -or- Bible"
+    },
+    {
+      "id": "duty-we-007",
+      "title": "🌱 Water plants",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 8,
+      "sourceXp": 1,
+      "xp": 1,
+      "decisionRef": "P8-001",
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending",
+      "previousTitle": "📖 Read a new book -or- Bible"
+    },
+    {
+      "id": "duty-wd-008",
+      "title": "💧 Drink 3 glasses of water (House)",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 9,
+      "sourceXp": 1,
+      "xp": 1,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-we-008",
+      "title": "💧 Drink 3 glasses of water (House)",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 9,
+      "sourceXp": 1,
+      "xp": 1,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-wd-009",
+      "title": "📝 Research & write by hand",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 10,
+      "sourceXp": 1,
+      "xp": 1,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-we-009",
+      "title": "📝 Research & write by hand",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 10,
+      "sourceXp": 2,
+      "xp": 1,
+      "decisionRef": "P3-003",
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-wd-010",
+      "title": "🎨 Draw / Create Dance",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 11,
+      "sourceXp": 1,
+      "xp": 1,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-we-010",
+      "title": "🎨 Draw / Create Dance",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 11,
+      "sourceXp": 1,
+      "xp": 1,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-wd-011",
+      "title": "🧹 Clean up Closet / Shoes",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 12,
+      "sourceXp": 2,
+      "xp": 2,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-we-011",
+      "title": "🧹 Clean up Closet / Shoes",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 12,
+      "sourceXp": 2,
+      "xp": 2,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-wd-012",
+      "title": "🎁 Declutter/give away items",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 13,
+      "sourceXp": 2,
+      "xp": 2,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-we-012",
+      "title": "🎁 Declutter/give away items",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 13,
+      "sourceXp": 2,
+      "xp": 2,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-wd-013",
+      "title": "📚 Hikari Shop",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 14,
+      "sourceXp": 2,
+      "xp": 2,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-we-013",
+      "title": "📚 Hikari Shop",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 14,
+      "sourceXp": 2,
+      "xp": 2,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-wd-014",
+      "title": "🙂 Final Attitude Check",
+      "variant": "weekday",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 15,
+      "sourceXp": 15,
+      "xp": 15,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    },
+    {
+      "id": "duty-we-014",
+      "title": "🙂 Final Attitude Check",
+      "variant": "weekend",
+      "days": [
+        "Saturday",
+        "Sunday"
+      ],
+      "sourceSheet": "Task Lists",
+      "sourceRow": 15,
+      "sourceXp": 15,
+      "xp": 15,
+      "decisionRef": null,
+      "dueTime": null,
+      "approvalPolicy": "either-parent; per-duty review details pending"
+    }
+  ],
+  "rewards": [
+    {
+      "id": "reward-001",
+      "sourceId": "1",
+      "title": "🎬 Choose a movie/TV Show for family movie night",
+      "coinCost": 450,
+      "sourceStatus": "Available",
+      "type": "In-House Event",
+      "tier": "1 ~ $10"
+    },
+    {
+      "id": "reward-002",
+      "sourceId": "2",
+      "title": "🃏 Pokémon Booster Pack (~$8)",
+      "coinCost": 600,
+      "sourceStatus": "Available",
+      "type": "Purchase -Game",
+      "tier": "1 ~ $10"
+    },
+    {
+      "id": "reward-003",
+      "sourceId": "3",
+      "title": "💍 Small accessory: earrings, bracelet, hair clips, phone charm, etc.",
+      "coinCost": 650,
+      "sourceStatus": "Available",
+      "type": "Purchase -Accessory",
+      "tier": "1 ~ $10"
+    },
+    {
+      "id": "reward-004",
+      "sourceId": "4",
+      "title": "🧋 Boba, smoothie, café or dessert outing with parent",
+      "coinCost": 675,
+      "sourceStatus": "Available",
+      "type": "Outdoors Food",
+      "tier": "1 ~ $10"
+    },
+    {
+      "id": "reward-005",
+      "sourceId": "5",
+      "title": "🧴 Small self-care/skincare item ($10 max)",
+      "coinCost": 800,
+      "sourceStatus": "Available",
+      "type": "Purchase -Beauty",
+      "tier": "1 ~ $10"
+    },
+    {
+      "id": "reward-006",
+      "sourceId": "6",
+      "title": "🍕 Pizza/takeout family night",
+      "coinCost": 1200,
+      "sourceStatus": "Available",
+      "type": "In-House Event Food",
+      "tier": "2 ~ $20"
+    },
+    {
+      "id": "reward-007",
+      "sourceId": "7",
+      "title": "📚 Book, novel, comic or manga under $20",
+      "coinCost": 1200,
+      "sourceStatus": "Available",
+      "type": "Purchase -Book",
+      "tier": "2 ~ $20"
+    },
+    {
+      "id": "reward-008",
+      "sourceId": "8",
+      "title": "☕ Special parent-daughter outing",
+      "coinCost": 1200,
+      "sourceStatus": "Available",
+      "type": "Outdoors Food",
+      "tier": "2 ~ $20"
+    },
+    {
+      "id": "reward-009",
+      "sourceId": "9",
+      "title": "🎲 Afternoon at the Arcade",
+      "coinCost": 1350,
+      "sourceStatus": "Available",
+      "type": "In-House Event",
+      "tier": "2 ~ $20"
+    },
+    {
+      "id": "reward-010",
+      "sourceId": "10",
+      "title": "💄 Skincare/beauty mini-haul ($20 max)",
+      "coinCost": 1400,
+      "sourceStatus": "Available",
+      "type": "Purchase -Beauty",
+      "tier": "2 ~ $20"
+    },
+    {
+      "id": "reward-011",
+      "sourceId": "11",
+      "title": "📖 New book or manga ($30 max)",
+      "coinCost": 1850,
+      "sourceStatus": "Available",
+      "type": "Purchase -Book",
+      "tier": "3 ~ $30"
+    },
+    {
+      "id": "reward-012",
+      "sourceId": "12",
+      "title": "👯 Friend comes over + favorite takeout/snacks",
+      "coinCost": 1900,
+      "sourceStatus": "Available",
+      "type": "In-House Event Food",
+      "tier": "3 ~ $30"
+    },
+    {
+      "id": "reward-013",
+      "sourceId": "13",
+      "title": "🎥 Go to the movies",
+      "coinCost": 1950,
+      "sourceStatus": "Available",
+      "type": "Outdoors Event",
+      "tier": "3 ~ $30"
+    },
+    {
+      "id": "reward-014",
+      "sourceId": "14",
+      "title": "👕 Branded T-shirt / band / K-pop / anime shirt or accessory",
+      "coinCost": 2000,
+      "sourceStatus": "Available",
+      "type": "Purchase -Clothing",
+      "tier": "3 ~ $30"
+    },
+    {
+      "id": "reward-015",
+      "sourceId": "15",
+      "title": "🧸 Pokémon/anime/K-pop collectible or plush ($30 max)",
+      "coinCost": 2050,
+      "sourceStatus": "Available",
+      "type": "Purchase -Collectible",
+      "tier": "3 ~ $30"
+    },
+    {
+      "id": "reward-016",
+      "sourceId": "16",
+      "title": "👯 Bring a friend to movies / café / eat out",
+      "coinCost": 2500,
+      "sourceStatus": "Available",
+      "type": "Outdoors Event",
+      "tier": "4 ~ $40"
+    },
+    {
+      "id": "reward-017",
+      "sourceId": "17",
+      "title": "🎲 New family board game ($40 max)",
+      "coinCost": 2500,
+      "sourceStatus": "Available",
+      "type": "Purchase -Game",
+      "tier": "4 ~ $40"
+    },
+    {
+      "id": "reward-018",
+      "sourceId": "18",
+      "title": "🏃 Sports/running/fitness gear upgrade",
+      "coinCost": 2550,
+      "sourceStatus": "Available",
+      "type": "Purchase -Sports",
+      "tier": "4 ~ $40"
+    },
+    {
+      "id": "reward-019",
+      "sourceId": "19",
+      "title": "🪞 Room décor / vanity / aesthetic bedroom upgrade ($40)",
+      "coinCost": 2650,
+      "sourceStatus": "Available",
+      "type": "Purchase -Room Decor",
+      "tier": "4 ~ $40"
+    },
+    {
+      "id": "reward-020",
+      "sourceId": "20",
+      "title": "🎒 School-style upgrade: backpack, tote, bottle, pencil case, etc.",
+      "coinCost": 5000,
+      "sourceStatus": "Available",
+      "type": "Purchase -Tools",
+      "tier": "5 ~ $75"
+    },
+    {
+      "id": "reward-021",
+      "sourceId": "21",
+      "title": "👟 Shoes/sneakers ($70)",
+      "coinCost": 5500,
+      "sourceStatus": "Available",
+      "type": "Purchase -Clothing",
+      "tier": "5 ~ $75"
+    },
+    {
+      "id": "reward-022",
+      "sourceId": "22",
+      "title": "🎓 Enroll in a short course/workshop she chooses",
+      "coinCost": 6000,
+      "sourceStatus": "Available",
+      "type": "Purchase -Class",
+      "tier": "5 ~ $75"
+    },
+    {
+      "id": "reward-023",
+      "sourceId": "23",
+      "title": "🃏 Pokémon ETB",
+      "coinCost": 6000,
+      "sourceStatus": "Available",
+      "type": "Purchase -Game",
+      "tier": "5 ~ $75"
+    },
+    {
+      "id": "reward-024",
+      "sourceId": "24",
+      "title": "💄 Premium skincare/beauty/fashion item ($60–75 max)",
+      "coinCost": 6000,
+      "sourceStatus": "Available",
+      "type": "Purchase -Beauty",
+      "tier": "5 ~ $75"
+    },
+    {
+      "id": "reward-025",
+      "sourceId": "25",
+      "title": "🎒 Premium backpack + full school/style kit",
+      "coinCost": 10000,
+      "sourceStatus": "Available",
+      "type": "Purchase -Tools",
+      "tier": "Premium ~ $100"
+    },
+    {
+      "id": "reward-026",
+      "sourceId": "26",
+      "title": "🎫 Contribution toward a concert/show/event she really wants",
+      "coinCost": 10000,
+      "sourceStatus": "Available",
+      "type": "Purchase -Event",
+      "tier": "Premium ~ $100"
+    },
+    {
+      "id": "reward-027",
+      "sourceId": "27",
+      "title": "🚗 Family day trip / nearby destination",
+      "coinCost": 11000,
+      "sourceStatus": "Available",
+      "type": "Outdoors Event",
+      "tier": "Premium ~ $100"
+    },
+    {
+      "id": "reward-028",
+      "sourceId": "28",
+      "title": "🛍️ $100 shopping/gift-card budget for K-pop, fashion, beauty, etc.",
+      "coinCost": 12500,
+      "sourceStatus": "Available",
+      "type": "Purchase",
+      "tier": "Premium ~ $100"
+    },
+    {
+      "id": "reward-029",
+      "sourceId": "29",
+      "title": "🎢 Theme park / major special-event day",
+      "coinCost": 16000,
+      "sourceStatus": "Available",
+      "type": "Outdoors Event",
+      "tier": "Platinum ~ $150+"
+    }
+  ],
+  "achievements": [
+    {
+      "id": "achievement-001",
+      "title": "Aced Test",
+      "xp": 50,
+      "sourceCondition": "Any test scored 100",
+      "preciseAwardCondition": "pending specification"
+    },
+    {
+      "id": "achievement-002",
+      "title": "Student of Excellence I",
+      "xp": 250,
+      "sourceCondition": "All trimester grades > 97",
+      "preciseAwardCondition": "pending specification"
+    },
+    {
+      "id": "achievement-003",
+      "title": "Student of Excellence II",
+      "xp": 300,
+      "sourceCondition": "Best student of the Class",
+      "preciseAwardCondition": "pending specification"
+    },
+    {
+      "id": "achievement-004",
+      "title": "Student of Excellence III",
+      "xp": 400,
+      "sourceCondition": "Best student of the Gen",
+      "preciseAwardCondition": "pending specification"
+    },
+    {
+      "id": "achievement-005",
+      "title": "Girl Machine",
+      "xp": 1000,
+      "sourceCondition": "1 month good behavior consistency",
+      "preciseAwardCondition": "pending specification"
+    },
+    {
+      "id": "achievement-006",
+      "title": "Wise Princess",
+      "xp": 2000,
+      "sourceCondition": "2 month FULL required consistency",
+      "preciseAwardCondition": "pending specification"
+    }
+  ],
+  "scoring": {
+    "scoreFloor": 0,
+    "earningThreshold": 85,
+    "passThreshold": 90,
+    "exceptionalScore": 100,
+    "exceptionalEarnedXp": 200,
+    "dailyScoreUpperCap": "none newly introduced; both standard task sets total 100",
+    "weekdayTaskTotal": 100,
+    "weekendTaskTotal": 100,
+    "decisionRefs": [
+      "P3-003",
+      "P3-004",
+      "P3-005"
+    ]
+  },
+  "reviewTiming": {
+    "onTimeSubmissionDelayedReview": "retain original-day eligibility",
+    "decisionRef": "P3-007"
+  },
+  "coinConversion": {
+    "mode": "automatic on finalized earned XP",
+    "coinsPerXp": 1,
+    "spendingErasesEarnedHistory": false,
+    "decisionRef": "P3-008",
+    "finalizationSchedule": "explicit parent action; reminder timing separate",
+    "correctionDebtPolicy": "pending"
+  },
+  "finalization": {
+    "mode": "explicit parent action",
+    "remindersRequired": true,
+    "finalReminderExampleLocalTime": "21:00",
+    "exactReminderSchedule": "07:15,15:20,17:00,19:00,21:00 America/Costa_Rica; checkpoint context deferred",
+    "reminderDoesNotFinalize": true,
+    "decisionRef": "P3-009",
+    "reminderTimesLocal": [
+      "07:15",
+      "15:20",
+      "17:00",
+      "19:00",
+      "21:00"
+    ],
+    "reminderContext": "owner supplies labels,text,task context during implementation; do not treat all slots as finalization-only prompts",
+    "reminderDecisionRefs": [
+      "P3-015",
+      "P3-016"
+    ]
+  },
+  "excuses": {
+    "protectDailyResult": true,
+    "protectionUsesVirtualPoints": true,
+    "virtualPointsEarnCoins": false,
+    "parentBonusOfferAction": true,
+    "exactThresholdAndBonusMath": "actual-only score must reach 85; days earning points through virtual conversion have no perfect-day bonus, max earned 100",
+    "decisionRefs": [
+      "P3-010",
+      "P3-011",
+      "P3-013",
+      "P3-014"
+    ],
+    "actualOnlyEarningThreshold": 85,
+    "perfectBonusOnConversionDay": false,
+    "maxEarnedXpOnConversionDay": 100
+  },
+  "rewardLifecycle": {
+    "requestChargesCoins": false,
+    "approveBy": "either authorized parent",
+    "charge": "saved price once on approval",
+    "cancelBeforeApproval": "free",
+    "parentCancelBeforeFulfillment": "refund original debit once",
+    "afterFulfillment": "exception policy pending",
+    "decisionRef": "P3-012"
+  },
+  "ratings": {
+    "coinRankBasis": "available coins",
+    "growthRatingPeriod": "daily",
+    "permanentLifetimeXpLevelApproved": false,
+    "optionalMonthToDateRating": "tentative idea, not approved",
+    "monthlyFormula": null,
+    "decisionRefs": [
+      "P3-017",
+      "P3-018"
+    ]
+  },
+  "appeals": {
+    "filingWindow": "original result day through end of following local day",
+    "sealsAt": "start of original result day plus two calendar days",
+    "timezone": "America/Costa_Rica",
+    "deadlineExclusive": true,
+    "example": "Monday result seals Wednesday 00:00",
+    "timelyPendingAppealAtSeal": "expire unresolved; no post-seal decision",
+    "latePublishedResult": "if first publication at or after normal original-day-plus-two boundary: seal at start of publication-local-date plus two days; no deadline refresh on later revision",
+    "sealedParentCorrectionPolicy": "forbidden; sealed result final",
+    "appealAloneAwardsXp": false,
+    "decisionRef": "P3-019",
+    "decisionRefs": [
+      "P3-019",
+      "P3-021",
+      "P3-022",
+      "P3-023"
+    ],
+    "examples": [
+      "Monday result normally seals Wednesday 00:00; unresolved appeal expires then",
+      "Monday result first published Wednesday: appeal through Thursday, seals Friday 00:00"
+    ]
+  },
+  "teenReminders": {
+    "previousDayResultReviewTimeLocal": "17:00",
+    "timezone": "America/Costa_Rica",
+    "otherPendingTaskRemindersRequired": true,
+    "otherTimesAndContent": "not specified",
+    "reminderIsNotAppealDeadline": true,
+    "decisionRef": "P3-020"
+  },
+  "deploymentStatus": "Owner-approved title overrides recorded; not yet deployed. Effective-date/version rollout must preserve historical occurrences."
+}
