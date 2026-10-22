@@ -1068,9 +1068,12 @@ alter table public.reward_requests add column catalogue_key text;
 alter table public.reward_requests add column debit_coins integer not null default 0 check(debit_coins>=0);
 alter table public.reward_requests add column updated_at timestamptz not null default clock_timestamp();
 
+-- Explicit declarations keep the dashboard's static RLS check informed.
+alter table public.daily_accounting enable row level security;
+alter table public.wallet_events enable row level security;
+alter table public.deduction_entries enable row level security;
 do $$ declare t text; begin
  foreach t in array array['daily_accounting','wallet_events','deduction_entries'] loop
- execute format('alter table public.%I enable row level security',t);
  execute format('revoke all on public.%I from public,anon,authenticated',t);
  execute format('grant select on public.%I to authenticated',t);
  execute format('create policy subject_read on public.%I for select to authenticated using(petal_private.can_read_teen(family_id,teen_id))',t);

@@ -1,6 +1,6 @@
 # Phase 8 — Teen quests, rewards and history
 
-Updated 21 October 2026. Status: local implementation built and independently source-reviewed; development SQL deployment, APK installation and owner acceptance remain pending. Phase8 is not complete.
+Updated 21 October 2026. Status: local implementation built and independently source-reviewed; development SQL deployment and owner acceptance remain pending. Phase8 is not complete.
 
 ## Implemented locally
 
@@ -25,7 +25,7 @@ Both debug APKs: BUILD SUCCESSFUL in10 seconds;167 tasks (4 executed,163 up-to-d
 - Teen SHA256: A75ABDBDE4616A7F49B98CE178AF2BB54F93695B9CDF3A5150366CD77EA58221
 - Parent SHA256: BACEE4EB48FBE78FF74C752D93EC6ADD97981E9C995C53DFE9279E0F1D424970
 
-No Android device was connected at the latest ADB check. Neither new APK has been installed yet. Existing app data will be retained on in-place install. The compatible shared family API remains version1; the new dashboard contract advertises version2 additively.
+Both prepared APKs were installed successfully in place on the connected Samsung. Existing application data was retained. The forward SQL bundle now enables RLS using explicit declarations for every new table; the previous dynamic declarations could trigger a dashboard scanner warning. The compatible shared family API remains version1; the new dashboard contract advertises version2 additively.
 
 ## Next owner actions
 
