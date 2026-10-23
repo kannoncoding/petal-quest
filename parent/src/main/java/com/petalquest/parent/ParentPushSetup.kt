@@ -55,6 +55,10 @@ internal suspend fun registerParentPush(context: Context, suppliedToken: String?
  val active = data.sessionStore().read()
  check(active != null && active.userId == session.userId && active.endpointId == session.endpointId && active.generation == session.generation)
  service.rpc("register_device", session.token, JSONObject().put("p_family_id", memberships.single().familyId).put("p_push_token", token))
+ val registration=com.petalquest.core.sync.FamilySync.get()?.registration ?: error("Family notifications are unavailable.")
+ registration.registerToken(token)
+ val confirmed=data.sessionStore().read()
+ check(confirmed!=null && confirmed.userId==session.userId && confirmed.endpointId==session.endpointId && confirmed.generation==session.generation)
 }
 
 @Composable

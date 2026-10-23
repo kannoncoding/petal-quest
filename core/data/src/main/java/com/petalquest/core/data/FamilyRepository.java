@@ -101,6 +101,18 @@ public final class FamilyRepository {
         synchronized (LocalData.LOCK) { requireActive(); return database.familyDao().pending(user,endpoint); }
     }
 
+    /** Preserve rejected intents for explicit review; automatic replay must skip these. */
+    public void blockAutomaticRetry(String requestId, int httpStatus) {
+        synchronized (LocalData.LOCK) {
+            requireActive();
+            database.familyDao().setStatus(user, endpoint, requestId, "needs_review_" + httpStatus);
+        }
+    }
+    /** Only an explicit user retry may release an actionable rejection back to dispatch. */
+    public void reviewForExplicitRetry(String requestId) {
+        synchronized (LocalData.LOCK) { requireActive(); database.familyDao().reviewForExplicitRetry(user,endpoint,requestId); }
+    }
+
     /** Call BEFORE attempting network dispatch. A timeout stays unresolved and must be reconciled. */
     public boolean markDispatched(String requestId) {
         synchronized (LocalData.LOCK) {

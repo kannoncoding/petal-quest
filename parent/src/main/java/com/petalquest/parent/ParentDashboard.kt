@@ -15,6 +15,7 @@ import com.petalquest.core.network.FamilyService
 import com.petalquest.core.network.FamilyServiceRejected
 import com.petalquest.core.ui.FamilyForegroundRefresh
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import org.json.*
 import java.util.Calendar
 import java.util.TimeZone
@@ -48,10 +49,34 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
  var cashAmount by remember { mutableStateOf("") }
  var confirmation by remember { mutableStateOf<List<ParentAction>?>(null) }
  var unresolved by remember { mutableStateOf<List<ParentAction>>(emptyList()) }
+ var blockedCount by remember { mutableStateOf(0) }
+ LaunchedEffect(session.generation,member) {
+  val activity=context as? MainActivity
+  val intent=activity?.intent
+  if(intent?.data?.scheme !in setOf("petalquest","petalquest-reminder")) return@LaunchedEffect
+  val currentAccess=withContext(Dispatchers.IO) { runCatching {
+   service.memberships(token(),session.userId).any { it.active && it.userId==member.userId && it.familyId==member.familyId && it.actorId==member.actorId && it.role=="parent" } && localData.sessionStore().read()?.generation==session.generation
+  }.getOrDefault(false) }
+  if(!currentAccess) return@LaunchedEffect
+  val bridge=(activity?.application as? PetalApplication)?.reminders
+  val reminderAllowed=withContext(Dispatchers.IO) { bridge?.ownershipFor(member)?.let { bridge.runtime.isCurrentOwnership(it,intent?.getStringExtra("reminder_owner")) }==true }
+  val familyAllowed=intent?.getStringExtra("family_session")==session.generation && intent.getStringExtra("family_id")==member.familyId
+  val target=if(reminderAllowed) intent?.getStringExtra("reminder_date") else if(familyAllowed) intent?.getStringExtra("family_date") else null
+  if(target!=null && runCatching { ParentDate.parse(target) }.isSuccess) { date=target;period="Day" }
+  if(familyAllowed) {
+   intent?.getStringExtra("family_teen")?.let { if(runCatching { java.util.UUID.fromString(it) }.isSuccess) teen=it }
+   section=when(intent?.getStringExtra("family_destination")) { "results"->"History";"school"->"School";else->"Review" }
+  }
+ }
+ LaunchedEffect(session.generation) { com.petalquest.core.sync.FamilySync.get()?.refreshes?.collect { stale=true;resumeRefreshPending=true } }
  LaunchedEffect(session.generation) { receipts.getString("unresolved-actions",null)?.let { saved -> val a=JSONArray(saved);unresolved=(0 until a.length()).map { val row=a.getJSONObject(it);ParentAction(row.getString("title"),row.getString("rpc"),row.getJSONObject("args")) } } }
  val cacheKey="parent:"+member.familyId+":"+teen+":"+date+":"+period
  suspend fun reload() {
   stale=true
+  withContext(Dispatchers.IO) {
+   val a=JSONArray(receipts.getString("unresolved-actions","[]")); unresolved=(0 until a.length()).map { val row=a.getJSONObject(it);ParentAction(row.getString("title"),row.getString("rpc"),row.getJSONObject("args")) }
+   blockedCount=com.petalquest.core.sync.FamilySync.get()?.parentBlockedActions(session.generation)?.size ?: 0
+  }
   val selected=ParentDate.parse(date)
   val from=when(period) { "Week" -> selected.minusDays((selected.sundayDay).toLong()); "Month" -> selected.withDayOfMonth(1); else -> selected }
   val to=when(period) { "Week" -> from.plusDays(6); "Month" -> from.plusMonths(1).minusDays(1); else -> from }
@@ -59,6 +84,7 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
   check(result.optString("family_id")==member.familyId) { "Family selection changed. Refresh family access." }
   withContext(Dispatchers.IO) { repository.cacheRemoteSnapshot(FamilyRepository.CacheKind.REVIEWS,cacheKey,result.toString()) }
   dashboard=result; stale=false
+  com.petalquest.core.sync.FamilySync.get()?.acceptRoutineSnapshot(member,JSONObject(result.toString()).put("_reminder_from",from.toString()).put("_reminder_to",to.toString()))
  }
  fun refresh() { if(busy) return; busy=true; scope.launch { try { reload();message="Updated from family service." } catch(e: CancellationException) { throw e } catch(e: Exception) { stale=true;message="Could not refresh. Saved information is read only. Try again when connected." } finally { busy=false } } }
  FamilyForegroundRefresh(onBackground={stale=true},onReturn={stale=true;resumeRefreshPending=true})
@@ -82,14 +108,17 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
  Text(if(stale || resumeRefreshPending) "Saved information · reconnect and refresh before making decisions" else "Current family information · server checks each decision")
  OutlinedButton(enabled=!busy,onClick={refresh()}) { Text("Refresh dashboard") }
  if(message.isNotBlank()) Text(message)
+ if(blockedCount>0) Text("$blockedCount saved decision(s) need review after a service rejection. Refresh and review the saved decision.")
  dashboard.rows("actors").filter { it.words("role")=="teen" }.forEachIndexed { index,row ->
   OutlinedButton(enabled=!busy && unresolved.isEmpty(),onClick={teen=row.words("actor_id",row.words("id",""))}) { Text("Teen ${index+1}"+(if(selectedTeen==row.words("actor_id",row.words("id",""))) " · selected" else "")) }
  }
  OutlinedTextField(date,{date=it},label={Text("History date (YYYY-MM-DD)")},singleLine=true,enabled=!busy && unresolved.isEmpty())
  Row { listOf("Day","Week","Month").forEach { label -> TextButton(enabled=!busy && unresolved.isEmpty(),onClick={period=label}) { Text(label) } } }
- Row(Modifier.horizontalScroll(rememberScrollState())) { listOf("Review","Adjust","History","Edit","Access").forEach { label -> TextButton(onClick={section=label}) { Text(label) } } }
+ Row(Modifier.horizontalScroll(rememberScrollState())) { listOf("Review","School","Vacation","Adjust","History","Edit","Access").forEach { label -> TextButton(onClick={section=label}) { Text(label) } } }
  if(unresolved.isNotEmpty()) { Text("An earlier decision needs confirmation from the service. Retry the saved decision before entering another.");OutlinedButton(enabled=!busy && !stale,onClick={confirmation=unresolved}) { Text("Review and retry saved decision") } }
  val enabled=!busy && !stale && !resumeRefreshPending && selectedTeen.isNotBlank() && unresolved.isEmpty()
+ if(section=="School") com.petalquest.core.ui.SchoolChecklistScreen(member,selectedTeen,session,service,token)
+ if(section=="Vacation") com.petalquest.core.ui.VacationModeControls(dashboard,enabled,service,token,::propose)
  if(section=="Review") {
   Text("Submission decisions",style=MaterialTheme.typography.titleMedium)
   Text("Points shown on duties are contributions. Earned XP and coins are confirmed when a day is published.")
@@ -202,12 +231,12 @@ fun ParentDashboard(member: Membership, session: Session, service: FamilyService
      val args=JSONObject(action.args.toString())
      if(action.rpc !in setOf("revoke_membership","issue_teen_replacement")) args.put("p_request_id",operationId)
      val result=service.rpc(action.rpc,token(),args)
-     receipts.edit().remove(identity).commit();completed++;unresolved=unresolved.drop(1);saveUnresolved()
+     if(action.rpc !in setOf("revoke_membership","issue_teen_replacement")) check(result.optString("request_id")==operationId) { "Response identity not confirmed. Saved decision retained." };receipts.edit().remove(identity).remove("blocked:"+operationId).commit();completed++;unresolved=unresolved.drop(1);saveUnresolved()
      if(action.rpc=="issue_teen_replacement") message="Replacement code: "+result.words("code")+" · expires "+result.words("expires_at")
     }
     if(message.startsWith("Replacement code:").not()) message="$completed action(s) confirmed by the service."
-   } catch(e: CancellationException) { throw e } catch(e: Exception) { if(e is FamilyServiceRejected && e.statusCode in 400..499 && e.statusCode!=408 && e.statusCode!=429) { unresolved=emptyList();receipts.edit().remove("unresolved-actions").commit() };message="$completed action(s) confirmed. "+(e.message ?: "No further change confirmed.")+" Refresh before trying again.";decisionError=message }
-   finally { confirmation=null;try { reload() } catch(e: Exception) { stale=true };busy=false }
+   } catch(e: CancellationException) { throw e } catch(e: Exception) { if(e is FamilyServiceRejected && e.statusCode in 400..499 && e.statusCode!=408 && e.statusCode!=429) { unresolved.firstOrNull()?.let { a -> receipts.getString(a.rpc+":"+a.args.toString(),null)?.let { id -> receipts.edit().putInt("blocked:"+id,e.statusCode).commit() } } };message="$completed action(s) confirmed. "+(e.message ?: "No further change confirmed.")+" Refresh before trying again.";decisionError=message }
+   finally { com.petalquest.core.sync.FamilySync.get()?.kick();confirmation=null;try { reload() } catch(e: Exception) { stale=true };busy=false }
   }
  }) { Text("Confirm ${actions.size} action(s)") }},dismissButton={TextButton(enabled=!busy,onClick={confirmation=null}) { Text("Keep reviewing") }}) }
  if(confirmation==null) decisionError?.let { error -> AlertDialog(onDismissRequest={decisionError=null},title={Text("Decision not fully confirmed")},text={Text(error)},confirmButton={TextButton(onClick={decisionError=null}) { Text("OK") }}) }

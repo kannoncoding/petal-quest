@@ -65,6 +65,10 @@ fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: Loca
   memberships=verified
   membershipStale=false
   if(selectedFamily !in memberships.map { it.familyId }) selectedFamily=memberships.firstOrNull()?.familyId.orEmpty()
+  verified.firstOrNull { it.familyId==selectedFamily && it.role==(if(isParent) "parent" else "teen") }?.let { com.petalquest.core.sync.FamilySync.get()?.bind(it) }
+ }
+ LaunchedEffect(selectedFamily,membershipStale,memberships) {
+  if(!membershipStale) memberships.firstOrNull { it.familyId==selectedFamily && it.role==(if(isParent) "parent" else "teen") }?.let { com.petalquest.core.sync.FamilySync.get()?.bind(it) }
  }
  LaunchedEffect(localData) {
   try {
@@ -138,7 +142,7 @@ fun FamilyAccessScreen(isParent: Boolean, config: ServiceConfig, localData: Loca
      key(member.familyId,session!!.userId,session!!.generation,config.url) { teenContent?.invoke(member,session!!,service,{ token() }) }
     }
    }
-   OutlinedButton(enabled=!busy,onClick={action { withContext(Dispatchers.IO) { localData.logout() }; session=null;memberships=emptyList();selectedFamily="";code="";password="";message="Signed out. Local family session cleared." }}) {Text("Sign out and clear local session")}
+   OutlinedButton(enabled=!busy,onClick={action { withContext(Dispatchers.IO) { com.petalquest.core.sync.FamilySync.get()?.logout() ?: localData.logout() }; session=null;memberships=emptyList();selectedFamily="";code="";password="";message="Signed out. Local family session cleared." }}) {Text("Sign out and clear local session")}
   }
   if(busy) CircularProgressIndicator()
   if(live && issuedCode.isNotBlank()) {

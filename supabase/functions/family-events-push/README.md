@@ -1,0 +1,25 @@
+# Family events push worker (Phase10)
+
+**Current development deployment:** this source was deployed in the Dashboard under the generated slug **swift-worker**. Apply phase10-worker-route-fix.sql to the previously configured job/webhook. Inspect swift-worker for invocations and edit that existing function for updates. The local source folder remains family-events-push; original deployment instructions below describe the initially intended name.
+
+Deployed to development as **swift-worker**. Routes/readiness, HTTP200 calls and owner-observed Parent/Teen school notifications have passed. The existing `parent-checkin-push` worker remains independent. The setup instructions below are for a new environment; do not reapply the accepted development upgrade.
+
+Deploy this function only to development project `hijtwgugzzpjjkuutyfy`, using `--no-verify-jwt`: its POST endpoint authenticates `x-petal-worker-key` against `PETAL_FAMILY_WORKER_SECRET` with digest comparison. Create a random secret of at least32 characters and set it as that Edge secret and as the unique Vault secret `petal_family_worker_secret`. Reuse the existing server-only `PETAL_FCM_SERVICE_ACCOUNT_JSON` for Firebase `petal-quest-dev`; never put any value into source files or Android configuration. The service role key is provided by the Edge environment.
+
+Apply `phase10-notifications-upgrade.sql` once over accepted migrations001–014. Do not reapply the initial development deployment bundle. Inspect readiness booleans, then deploy the worker and separately apply `phase10-schedule-family-events.sql` in development. The script installs a prompt database webhook on the private committed outbox and one five-minute retry job. No deployment or SQL execution occurred during preparation.
+
+Client RPCs:
+
+- `register_family_device(p_installation_id uuid,p_token text,p_app text,p_request_id uuid)`; app is `parent` or `teen`, required to match the authoritative active membership. Result: `{status:registered,installation_id,request_id}`.
+- `unregister_family_device(p_installation_id uuid,p_request_id uuid)`; revoke online before signing out. Result: `{status:unregistered,request_id}`. Offline logout must clear client identity and notifications immediately, then revoke/rebind on reconnection.
+- `list_family_notices(p_limit integer=50,p_before timestamptz=null)` returns `{notices:[...]}` with an own-recipient RLS view of unexpired minimal envelopes. Device and delivery tables are private and unreadable by clients.
+
+Use a random stable installation UUID per app installation; rotate request IDs for each new bind/unbind operation and retain the same ID only for an exact retry. Binding rotation invalidates old delivery leases on account switches, reactivation and role changes. A token can belong to only one installation. Revocation/unpairing invalidates devices through the membership trigger.
+
+The data-only FCM envelope is `kind=family_update`, `event_id`, `recipient_user_id`, `family_id`, optional `teen_id`/`local_date`, `destination`, and `expires_at_epoch`. Allowed destinations: `review`, `today`, `results`, `rewards`, `routines`, `school`. No descriptions, notes, reasons, health information, titles, points, Coins or XP are sent. After checking the current signed-in identity, active membership, actor, expiry and permission, the client may display only: **Open Petal Quest to see a family update.** A deep link must repeat these checks and refresh from the server. Event ID supports client alert deduplication.
+
+Each installation has an independent durable receipt, 90-second lease, at most8 attempts and exponential delay capped at one hour; notices expire after7 days. A failed sibling device cannot be hidden by another device's success. Unregistered FCM tokens are deactivated. Worker calls authorize immediately before sending; a membership change after authorization can race a network send, so the client must always reject stale account/membership envelopes. Push cannot establish access or mutate accounting. App resume refresh recovers missed updates.
+
+Business mapping: pending/resubmitted duty, reward/extra request, appeal request and submitted bonus notify active parents; reviews, corrections, finalization, bonus offers/reviews, outcomes and appeal resolutions notify the active matching teen. New duty, routine and catalogue versions notify teens. Self-authored redundant notices are suppressed where source author is available; canonical submission review suppresses duplicate approval notices. Health and unknown outbox topics are excluded. Existing last-seven-day business facts may be reconciled at first worker run, under the same recipient authorization.
+
+Migration018 groups daily-duty/catalogue alerts and prevents pre-enrollment backlog from producing notices on a newly bound installation. Fresh events have priority over older retries. See docs/phase10/Completion-Report.md for accepted Samsung evidence and deferred independent-device/regression checks. Do not infer other event-type or future-date runtime passes from the observed school notifications.

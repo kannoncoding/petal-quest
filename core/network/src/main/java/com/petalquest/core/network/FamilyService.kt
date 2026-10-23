@@ -83,7 +83,7 @@ class FamilyService(private val config: ServiceConfig) {
  }
  suspend fun rpc(name: String, token: String, args: JSONObject): JSONObject {
   requireContract(token)
-  require(name in setOf("create_family","issue_parent_invite","issue_teen_pairing","accept_parent_invite","redeem_teen_pairing","create_occurrence","reconcile_occurrences","submit_occurrence","approve_submission","revoke_membership","issue_teen_replacement","register_device",
+  require(name in setOf("get_vacation_preview","set_vacation_schedule","end_vacation_mode","list_school_items","school_item_action","register_family_device","unregister_family_device","list_family_notices","create_family","issue_parent_invite","issue_teen_pairing","accept_parent_invite","redeem_teen_pairing","create_occurrence","reconcile_occurrences","submit_occurrence","approve_submission","revoke_membership","issue_teen_replacement","register_device",
    "save_assigned_routine", "correct_occurrence", "offer_bonus", "submit_bonus", "review_bonus", "reverse_deduction", "save_reflection_note", "save_task_catalogue", "confirm_cash_outcome", "review_submission_checked", "get_parent_dashboard", "review_submission", "finalize_complete_day", "enter_deduction", "review_extra_outcome", "review_reward_request", "approve_reward_request", "save_catalogue_version", "resolve_day_appeal", "get_teen_dashboard", "materialize_teen_tasks", "request_reward", "cancel_reward_request", "request_extra_outcome", "request_day_appeal",
    "register_health_installation", "list_health_installations", "request_wipe", "list_pending_wipes", "claim_wipe", "acknowledge_wipe",
    "upsert_period_range", "delete_period_range", "list_period_ranges", "submit_high_pain_checkin", "list_parent_checkins", "get_checkin_policy"))

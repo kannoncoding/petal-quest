@@ -16,6 +16,8 @@ class MainActivity : ComponentActivity() {
  private val localData by lazy { LocalData.getInstance(this) }
  override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState)
  window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
- setContent { MaterialTheme { Scaffold { inset -> Column(Modifier.padding(inset)) { ParentPushSetup(); FamilyAccessScreen(true, ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE), localData, Modifier.weight(1f), parentContent = { member, session, service, token -> ParentDashboard(member, session, service, localData, token) }) } } } }
+ setContent { MaterialTheme { Scaffold { inset -> Column(Modifier.padding(inset)) { ParentPushSetup(); FamilyAccessScreen(true, ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE), localData, Modifier.weight(1f), parentContent = { member, session, service, token ->
+ com.petalquest.core.reminders.Phase10ReminderPanel((application as PetalApplication).reminders,member)
+ ParentDashboard(member, session, service, localData, token) }) } } } }
  }
 }

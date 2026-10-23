@@ -19,5 +19,9 @@ public interface FamilyDao {
     int markDispatched(String user, String endpoint, String id, long now);
     @Query("DELETE FROM pending_operations WHERE userId=:user AND endpointId=:endpoint AND requestId=:id AND status='sent_needs_reconcile'")
     int acknowledge(String user, String endpoint, String id);
+    @Query("UPDATE pending_operations SET status=:status WHERE userId=:user AND endpointId=:endpoint AND requestId=:id")
+    int setStatus(String user, String endpoint, String id, String status);
+    @Query("UPDATE pending_operations SET status='queued' WHERE userId=:user AND endpointId=:endpoint AND requestId=:id AND status LIKE 'needs_review_%'")
+    int reviewForExplicitRetry(String user, String endpoint, String id);
     @Query("DELETE FROM pending_operations WHERE userId=:user AND endpointId=:endpoint") void clearQueue(String user, String endpoint);
 }

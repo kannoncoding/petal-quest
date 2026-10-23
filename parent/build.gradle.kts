@@ -36,6 +36,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -55,6 +56,9 @@ android.buildTypes.configureEach {
 }
 androidComponents { beforeVariants(selector().withBuildType("staging")) { it.enable = rootProject.file("../Configuration/Supabase/staging.local.json").isFile && rootProject.file("../Configuration/Firebase/Staging/google-services.json").isFile } }
 dependencies {
+ implementation(project(":core:sync"))
+ implementation(project(":core:reminders"))
+ coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
  implementation(project(":core:ui"))
     implementation(platform(libs.firebase.bom))

@@ -1,6 +1,8 @@
 package com.example.petalquest
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.collect
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -43,6 +46,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
  var message by remember { mutableStateOf("") }
  var stale by remember { mutableStateOf(false) }
  var resumeRefreshPending by remember { mutableStateOf(false) }
+ LaunchedEffect(session.generation) { com.petalquest.core.sync.FamilySync.get()?.refreshes?.collect { stale=true;resumeRefreshPending=true } }
  var page by remember { mutableStateOf("Quests") }
  var range by remember { mutableStateOf("Week") }
  var anchor by remember { mutableStateOf(dateText(Calendar.getInstance(familyZone))) }
@@ -52,6 +56,27 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
  var outcomeDate by remember { mutableStateOf(dateText(Calendar.getInstance(familyZone))) }
  var outcomeReason by remember { mutableStateOf("") }
  var appealReason by remember { mutableStateOf("") }
+ var achievementRequest by remember { mutableStateOf<JSONObject?>(null) }
+ val achievementsAnchor=remember { BringIntoViewRequester() }
+ val notificationContext=androidx.compose.ui.platform.LocalContext.current
+ LaunchedEffect(session.generation,member) {
+  val activity=notificationContext as? MainActivity
+  val intent=activity?.intent
+  if(intent?.data?.scheme !in setOf("petalquest","petalquest-reminder")) return@LaunchedEffect
+  val currentAccess=withContext(Dispatchers.IO) { runCatching {
+   service.memberships(token(),session.userId).any { it.active && it.userId==member.userId && it.familyId==member.familyId && it.actorId==member.actorId && it.role=="teen" } && localData.sessionStore().read()?.generation==session.generation
+  }.getOrDefault(false) }
+  if(!currentAccess) return@LaunchedEffect
+  val bridge=(activity?.application as? PetalApplication)?.reminders
+  val reminderAllowed=withContext(Dispatchers.IO) {
+   bridge?.ownershipFor(member)?.let { bridge.runtime.isCurrentOwnership(it,intent?.getStringExtra("reminder_owner")) } == true
+  }
+  val familyAllowed=intent?.getStringExtra("family_session")==session.generation && intent.getStringExtra("family_id")==member.familyId
+  val target=if(reminderAllowed) intent?.getStringExtra("reminder_date") else if(familyAllowed) intent?.getStringExtra("family_date") else null
+  if(target!=null && runCatching { java.time.LocalDate.parse(target) }.isSuccess) { anchor=target;selectedDay=target;range="Day";page="History";resumeRefreshPending=true }
+  else if(familyAllowed && intent?.getStringExtra("family_destination")=="rewards") page="Rewards"
+  else if(familyAllowed && intent?.getStringExtra("family_destination")=="school") page="School"
+ }
  fun bounds(): Pair<String,String> {
   val cal=Calendar.getInstance(familyZone).apply { time=SimpleDateFormat("yyyy-MM-dd",Locale.US).apply { timeZone=familyZone }.parse(anchor)!! }
   when(range) { "Week" -> cal.add(Calendar.DATE,-(cal.get(Calendar.DAY_OF_WEEK)-Calendar.SUNDAY)); "Month" -> cal.set(Calendar.DAY_OF_MONTH,1) }
@@ -75,14 +100,16 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
   }
   if(newlyApproved) celebration++
   snapshot=remote;stale=false
+  com.petalquest.core.sync.FamilySync.get()?.acceptRoutineSnapshot(member,remote)
   withContext(Dispatchers.IO) { repository.cacheRemoteSnapshot(FamilyRepository.CacheKind.QUESTS,member.familyId+":"+from+":"+to,remote.toString()); pending=repository.pending() }
  }
- fun action(block:suspend () -> Unit) { if(!busy) { busy=true;scope.launch { try { message="";block() } catch(e:CancellationException) { throw e } catch(e:Exception) { stale=true;message=e.message ?: "No change confirmed. Retry when connected." } finally { try { pending=withContext(Dispatchers.IO) { repository.pending() } } catch(e:CancellationException) { throw e } catch(_:Exception) { pending=emptyList();snapshot=null };busy=false } } } }
+ fun action(block:suspend () -> Unit) { if(!busy) { busy=true;scope.launch { try { message="";block() } catch(e:CancellationException) { throw e } catch(e:Exception) { stale=true;message=e.message ?: "No change confirmed. Retry when connected." } finally { try { pending=withContext(Dispatchers.IO) { repository.pending() } } catch(e:CancellationException) { throw e } catch(_:Exception) { pending=emptyList();snapshot=null };com.petalquest.core.sync.FamilySync.get()?.kick();busy=false } } } }
  FamilyForegroundRefresh(onBackground={stale=true},onReturn={stale=true;resumeRefreshPending=true})
  LaunchedEffect(resumeRefreshPending,busy) {
   if(resumeRefreshPending && !busy) { resumeRefreshPending=false;action { load() } }
  }
  suspend fun dispatch(op:PendingOperation) {
+  if(op.status.startsWith("needs_review")) withContext(Dispatchers.IO) { repository.reviewForExplicitRetry(op.requestId) }
   if(op.kind==FamilyRepository.OperationKind.QUEST_SUBMIT.name) { submissions.retry(op,token());return }
   val payload=JSONObject(op.canonicalPayload)
   if(op.kind==FamilyRepository.OperationKind.BONUS_SUBMIT.name) {
@@ -122,7 +149,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
  Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
   Text("Your garden",style=MaterialTheme.typography.headlineMedium)
   Text("Costa Rica time · weeks start Sunday")
-  Row { listOf("Quests","Rewards","History").forEach { tab -> TextButton(enabled=!busy,onClick={page=tab;if(tab=="Quests") { range="Week";anchor=dateText(Calendar.getInstance(familyZone)) }}) { Text(if(tab==page) "• $tab" else tab) } } }
+  Row { listOf("Quests","School","Rewards","History").forEach { tab -> TextButton(enabled=!busy,onClick={page=tab;if(tab=="Quests") { range="Week";anchor=dateText(Calendar.getInstance(familyZone)) }}) { Text(if(tab==page) "• $tab" else tab) } } }
   if(busy) LinearProgressIndicator(Modifier.fillMaxWidth())
   if(stale || resumeRefreshPending) Text("Saved server snapshot · refresh to check current status")
   OutlinedButton(enabled=!busy,onClick={action { load() }}) { Text("Refresh confirmed results") }
@@ -155,15 +182,18 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
      else -> "Reward request"
     }
     Text(subject)
+    if(op.status.startsWith("needs_review")) Text("Service rejected this request. Refresh and review it before retrying.")
     OutlinedButton(enabled=!busy,onClick={action { dispatch(op);load() }}) { Text("Retry this request") }
    }
   }
   val data=snapshot
   if(data==null) Text("Connect to load your tasks and confirmed rewards.")
   else when(page) {
+   "School" -> com.petalquest.core.ui.SchoolChecklistScreen(member,member.actorId,session,service,token)
    "Quests" -> {
     Row { Text("Weekly view");Switch(weekly,{weekly=it},enabled=!busy) }
     Text(if(weekly) "Tasks this Sunday–Saturday" else "Tasks today",style=MaterialTheme.typography.titleLarge)
+    TextButton(onClick={scope.launch { achievementsAnchor.bringIntoView() }}) { Text("Go to special achievements ↓") }
     val today=if(!stale) data.value("server_local_date",dateText(Calendar.getInstance(familyZone))) else dateText(Calendar.getInstance(familyZone))
     data.rows("day_summaries").firstOrNull { it.value("local_date")==today && it.value("status") in listOf("finalized","sealed") }?.let { result ->
      Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(6.dp)) {
@@ -213,6 +243,33 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
     Text("Bonus completion requires parent review before the original day seals. It converts virtual protection into actual points; conversion days do not receive perfect-day doubling.")
     data.rows("reflection_notes").filter { weekly || it.value("local_date")==today }.forEach { reflection -> Text("Parent reflection · ${reflection.value("local_date")}",style=MaterialTheme.typography.titleSmall);Text(reflection.value("text","")) }
     Text("Completion is a request for review. Parent review and finalized daily earnings are separate.")
+    Spacer(Modifier.height(12.dp))
+    HorizontalDivider()
+    Column(Modifier.fillMaxWidth().bringIntoViewRequester(achievementsAnchor),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+     Text("Special achievements",style=MaterialTheme.typography.headlineSmall)
+     Text("Aced a test or reached a milestone? Ask a parent to confirm it. These are separate from daily duties.",style=MaterialTheme.typography.bodyMedium)
+     data.rows("achievements").forEach { achievement ->
+      val queued=pending.any { it.kind=="EXTRA_OUTCOME_REQUEST" && JSONObject(it.canonicalPayload).value("outcome_key")==achievement.value("id") }
+      Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+       Text(achievement.value("title"),style=MaterialTheme.typography.titleMedium)
+       Text("${achievement.value("xp")} XP · parent confirmation required",style=MaterialTheme.typography.labelLarge)
+       achievement.value("sourceCondition","").takeIf { it.isNotBlank() }?.let { Text(it,style=MaterialTheme.typography.bodyMedium) }
+       OutlinedButton(enabled=!busy && !queued,onClick={outcomeDate=today;outcomeReason="";achievementRequest=achievement}) { Text(if(queued) "Request saved · pending send" else "Request achievement") }
+       data.rows("extra_outcome_requests").filter { it.value("outcome_key")==achievement.value("id") }.takeLast(2).forEach { request -> Text("${request.value("target_date")} · ${request.value("status").replace('_',' ')}",style=MaterialTheme.typography.bodySmall) }
+      } }
+     }
+     if(data.rows("achievements").isEmpty()) Text("No special achievements available yet.")
+    }
+    achievementRequest?.let { achievement ->
+     AlertDialog(onDismissRequest={if(!busy) achievementRequest=null},title={Text(achievement.value("title"))},text={Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
+      Text("A parent reviews this request before any award is granted.")
+      OutlinedTextField(outcomeDate,{outcomeDate=it},label={Text("Achievement date · YYYY-MM-DD")},singleLine=true)
+      OutlinedTextField(outcomeReason,{outcomeReason=it.take(1000)},label={Text("Tell your parent about it · optional")})
+     }},confirmButton={TextButton(enabled=!busy && runCatching { java.time.LocalDate.parse(outcomeDate) }.isSuccess,onClick={action {
+      val op=withContext(Dispatchers.IO) { repository.enqueue(FamilyRepository.OperationKind.EXTRA_OUTCOME_REQUEST,JSONObject().put("kind","achievement").put("outcome_key",achievement.value("id")).put("target_date",outcomeDate).put("reason",outcomeReason.trim()).toString()) }
+      achievementRequest=null;dispatch(op);load()
+     }}) { Text("Send request") }},dismissButton={TextButton(enabled=!busy,onClick={achievementRequest=null}) { Text("Cancel") }})
+    }
    }
    "Rewards" -> {
     Text("Reward shop",style=MaterialTheme.typography.titleLarge)
@@ -235,13 +292,12 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
       val op=withContext(Dispatchers.IO) { repository.pending().firstOrNull { it.kind=="REWARD_CANCEL" && JSONObject(it.canonicalPayload).value("reward_request_id")==id } ?: repository.enqueue(FamilyRepository.OperationKind.REWARD_CANCEL,JSONObject().put("reward_request_id",id).toString()) };dispatch(op);load()
      }}) { Text("Cancel request · free before approval") }
     }
-    Text("Achievements",style=MaterialTheme.typography.titleLarge)
-    Text("Ask a parent to confirm an achievement, cash recommendation or privilege. A request does not grant coins, cash or access.")
+    Text("Cash & privileges",style=MaterialTheme.typography.titleLarge)
+    Text("Ask a parent to confirm cash or a privilege. Special achievements are at the bottom of Quests. A request does not grant coins, cash or access.")
     Text("Cash and privilege entries are catalogue references. This form does not calculate an amount from a daily score; a parent confirms eligibility and any amount. The history icon separately uses protected score.")
     OutlinedTextField(outcomeDate,{outcomeDate=it},label={Text("Request date · YYYY-MM-DD")},singleLine=true)
     OutlinedTextField(outcomeReason,{outcomeReason=it.take(1000)},label={Text("Reason for parent review · optional")})
-    val outcomes=data.rows("achievements").map { "achievement" to it } +
-     data.optJSONObject("outcome_catalogue")?.rows("cash").orEmpty().map { "cash" to it } +
+    val outcomes=data.optJSONObject("outcome_catalogue")?.rows("cash").orEmpty().map { "cash" to it } +
      data.optJSONObject("outcome_catalogue")?.rows("privileges").orEmpty().map { "privilege" to it }
     outcomes.forEach { (kind,item) ->
      val id=item.value("id")
@@ -256,7 +312,7 @@ internal fun TeenQuestScreen(member: Membership, session: Session, service: Fami
      } }
     }
     Text("Your confirmation requests",style=MaterialTheme.typography.titleMedium)
-    data.rows("extra_outcome_requests").forEach { request ->
+    data.rows("extra_outcome_requests").filter { it.value("kind")!="achievement" }.forEach { request ->
      val title=outcomes.firstOrNull { it.second.value("id")==request.value("outcome_key") }?.second?.value("title") ?: request.value("kind")
      Text("$title · ${request.value("target_date")} · ${request.value("status")}\n${request.value("reason","")}")
     }

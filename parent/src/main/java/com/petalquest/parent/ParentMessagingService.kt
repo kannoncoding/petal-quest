@@ -18,12 +18,16 @@ import java.util.UUID
 
 class ParentMessagingService : FirebaseMessagingService() {
  override fun onNewToken(token: String) {
+  com.petalquest.core.sync.FamilySync.get()?.registration?.updateToken(token)
   // Rebind rotated tokens only for the explicitly opted-in, current parent session.
   CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
    try { registerParentPush(applicationContext, token) } catch (_: Exception) { /* Foreground retry; no token logging. */ }
   }
  }
  override fun onMessageReceived(message: RemoteMessage) {
+  if(message.notification==null && message.data["kind"]=="family_update") {
+   kotlinx.coroutines.runBlocking { com.petalquest.core.sync.FamilyPushNotifications.receive(this@ParentMessagingService,message.data) }; return
+  }
   try {
    val data = message.data
    if (message.notification != null || data["kind"] != "parent_checkin" || !pushOptIn(this) || !notificationPermission(this)) return

@@ -1,0 +1,42 @@
+# Local reminders integration
+
+This library contains only local Room persistence, inexact AlarmManager scheduling, notification receivers, and Compose settings. It has no network, health, upload, scoring, or task mutation API.
+
+## Host contract
+
+1. Include `:core:reminders` and depend on it from each host app. Java time desugaring must also be enabled in the application (minSdk 24).
+2. After authenticating, call `ReminderRuntime.initialize(context, ReminderOwnership(userId, familyId, role, sessionId))` from a coroutine. Use a stable identifier for the authenticated session, never an access token. Roles must be `teen` or `parent` for role-specific review behavior. Separate installed host packages have separate databases and alarm identities.
+3. Await `runtime.clearOwnership()` **before** signout, account/family/role switch, or invalid-session navigation. Rebind on every authenticated app entry. A changed binding cancels alarms/notifications and deletes personal rules and occurrences. Do not allow a signed-in screen to reuse another session's runtime binding. Exclude `reminders.db` and `reminders_state.xml` from cloud/device-transfer backup or disable host backup; no migration of reminders into another signed-in context is supported.
+4. Fetch the next 14 calendar dates from the existing authenticated `get_teen_dashboard` first. Only after successful authoritative sync, call `syncAssigned(ownership, snapshots, rangeStart, rangeEndInclusive)`. `AssignedReminder` requires confirmed `routineId`, `version`, occurrence `id`, `title`, `localDate`, `localTimes`, and `weekdays`; no times are invented from metadata. Missing routines, removed occurrences, and superseded versions are replaced as a full window. Do **not** pass an empty list on network/auth failure. Family times resolve in `America/Costa_Rica`.
+5. After successfully fetching the authoritative previous-day result, call `syncPreviousDayReview(ownership, yesterday, authoritativeUnsealed)`. This creates the approved Teen 17:00 reminder only when that result exists and is unsealed; false cancels it. Notification launch `reminder_date` is the **previous date**. Refresh when the result seals. No late publication notification is generated.
+6. Render `ReminderSettingsScreen(runtime, ownership, onRequestNotificationPermission)` inside authenticated navigation. The host callback launches Android 13+ POST_NOTIFICATIONS permission or system channel/app notification settings. Refresh with `runtime.rebuild()` after returning. Permission denial does not prevent personal creation. Do not automatically prompt on launch.
+7. Notification launch extras are `reminder_date` and `reminder_owner`. Validate `runtime.isCurrentOwnership(ownership, intent.getStringExtra("reminder_owner"))` after authentication before routing. Re-fetch authoritative content for that date; never mutate tasks/score from receipt, snooze, or dismissal.
+8. Configure confirmed owner policy with `configure(ownership, QuietHours(start, end), snoozeMinutes)`; null values disable quiet hours/snooze. The confirmed owner defaults are quiet hours 22:00–07:00 Costa Rica and snooze 10 minutes. They are applied once per binding; later user edits, including disabling either option, survive foreground refresh and reboot. Parent checkpoint times (07:15, 16:00, 17:00, 20:00, 21:10) remain **unscheduled** pending approved recipients/context/days. No sample checkpoint content is installed.
+
+`savePersonal` accepts either a one-off date or selected weekdays, an explicit IANA zone (default clearly labeled Costa Rica), local time, and title. Editing with the same ID replaces its local future occurrences; `removePersonal` cancels them. Personal rules are scoped to the current family/user/role/session and are never synchronized.
+
+## Delivery behavior and limitations
+
+- One-shot `setAndAllowWhileIdle(RTC_WAKEUP, ...)` alarms are inexact and may be delayed by OS batching. No exact-alarm permission, foreground service, or battery-exemption request is declared.
+- Reboot, package update, clock/time-zone change, and a daily maintenance alarm rebuild future alarms. Personal weekday rules expand a rolling 31-date horizon. Rebuild does not replay missed occurrences. Android force-stop suppresses alarms until a subsequent app launch; notification/channel permission denial suppresses delivery.
+- Assigned occurrences are date-resolved snapshots, so their weekdays are a validation filter rather than an inferred recurring rule. Personal zone selection is explicit; family schedules stay in Costa Rica when the device zone changes.
+- Quiet hours defer delivery to their end in Costa Rica. Snooze starts only after explicit notification action; dismiss persists locally. Neither mutates the authoritative routine/result.
+- Alarm PendingIntents use stable SHA-256 occurrence identities in their data URI, with immutable flags. Room delivery claims persist across reboot/clock rollback and implement at-most-once delivery (a process death after claim may lose a notification). The ledger intentionally survives ownership changes as opaque hashes to prevent replay when revisiting a session.
+- Database replacement and delivery claims are serialized and transactional. OS cancellation follows database invalidation; receivers recheck the active binding and row, making stale queued broadcasts harmless. Quiet-hours policy changes rebuild future delivery only.
+- Notification public versions contain only “Petal Quest / You have a reminder.” Private notification content uses the reminder title.
+
+Official API references consulted: [AlarmManager](https://developer.android.com/reference/android/app/AlarmManager), [notification permission](https://developer.android.com/develop/ui/views/notifications/notification-permission), [schedule alarms](https://developer.android.com/develop/background-work/services/alarms/schedule). WorkManager is not required for timestamp reminder delivery; all server synchronization remains host-owned.
+
+## FamilySync bridge and dashboard button
+
+Install `val reminderBridge = FamilyReminderBridge.install(familySync, localData)` in the Application immediately after `FamilySync.install`. It registers the awaited ownership hook (including clear before logout) and authoritative snapshot callback. Foreground FamilySync fetches yesterday through today+13 and tags the confirmed range with `_reminder_from`/`_reminder_to`. Partial/history UI snapshots lack this metadata and cannot erase future schedules. The bridge validates family/Teen identity, parses Sunday-based server weekdays, and gates the prior-day review using published/unsealed authoritative summaries. Malformed or failed snapshots do not replace reminders.
+
+Insert `Phase10ReminderPanel(reminderBridge, membership, onRequestNotificationPermission)` in an authenticated host screen. Keep the bridge as an Application-owned singleton per installed host. The panel checks the active membership/session and uses a bounded dialog for settings. Application ownership hooks must be installed before any FamilySync authorization or logout can run.
+
+## Confirmed defaults and disabled checkpoint configuration
+
+Quiet hours 22:00–07:00 Costa Rica and snooze 10 minutes are owner-approved defaults, initialized once per session binding. `configure` records the policy initialization marker, so subsequent authorization/rebuild never overwrites user changes. Changing to a different authenticated binding starts its own defaults.
+
+Parent checkpoints are now resolved by FamilyReminderBridge from authenticated Parent snapshots: both parents, every day, suppress after finalization. Wednesday shifts end November 27, 2026. The school-drop slot is omitted after the term and during vacations. School and home reminder policies, the 06:55 quiet-hours exception, and vacation behavior are documented in docs/phase10/School-and-Vacation-Decisions.md. School items recur at breaks; home reminders stop on Teen submission and expire at midnight. Failed network reads preserve the previous confirmed schedules.
+
+Source review fixes: rebuilding keeps existing overdue inexact registrations (without replaying past alarms after reboot); title-only personal edits retain local snooze/dismiss state while updating content; previous-day review rows expire at the authoritative `effective_seal_at`, preventing delivery after sealing even when offline. Permission restoration rebuilds only future reminders and never replays denied past deliveries. Successful previously confirmed schedules remain stored through network failures.

@@ -62,13 +62,17 @@ class MainActivity : ComponentActivity() {
                     BrandLaunchScreen()
                 } else {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    var showFamily by remember { mutableStateOf(false) }
+                    var showFamily by remember { mutableStateOf(intent?.data?.scheme in setOf("petalquest", "petalquest-reminder")) }
                     if (showFamily || !BuildConfig.DEBUG) {
                         Column(modifier = Modifier.padding(innerPadding)) {
                             OutlinedButton(onClick = { startActivity(android.content.Intent(this@MainActivity, com.example.petalquest.health.PrivateCycleActivity::class.java)) }) { Text("Private cycle log") }
                             if (BuildConfig.DEBUG) OutlinedButton(onClick = { showFamily = false }) { Text("Back to development previews") }
                             com.petalquest.core.ui.FamilyAccessScreen(false, com.petalquest.core.model.ServiceConfig(BuildConfig.SERVICE_URL, BuildConfig.SERVICE_PUBLIC_KEY, BuildConfig.BUILD_TYPE), localData,
-                                teenContent = { member, session, service, token -> TeenQuestScreen(member, session, service, token, localData) })
+                                teenContent = { member, session, service, token ->
+                                    TeenPushSetup()
+                                    com.petalquest.core.reminders.Phase10ReminderPanel((application as PetalApplication).reminders,member)
+                                    TeenQuestScreen(member, session, service, token, localData)
+                                })
                         }
                     } else if (BuildConfig.DEBUG) {
                         var showAssets by remember { mutableStateOf(false) }
